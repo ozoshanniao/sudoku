@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-secondary: #3654c8;
+  --color-secondary-container: #e8ecff;
+  --color-primary: #121212;
+  --color-surface-variant: #eeeeee;
+  --color-error: #ba1a1a;
+  
+  --color-surface-container: #eeeeee;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface-container-highest: #e2e2e2;
+  --color-on-surface-variant: #444748;
+  --color-outline-variant: #c4c7c7;
+
+  --spacing-grid-margin: 24px;
+  --spacing-cell-border: 1px;
+  --spacing-block-border: 2px;
+  --spacing-stack-lg: 32px;
+  --spacing-stack-sm: 8px;
+  --spacing-cell-gap: 0px;
+  --spacing-stack-md: 16px;
+  --spacing-stack-xl: 48px;
+
+  --border-width-block-border: 2px;
+  --border-width-cell-border: 1px;
+
+  --font-sans: "Geist", "Inter", system-ui, sans-serif;
+  --font-mono: "Geist", monospace;
+  
+  --animate-fade-in: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-up: scale-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@utility font-display-cell {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+@utility text-display-cell {
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+@utility font-display-cell-mobile {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 400;
+}
+@utility text-display-cell-mobile {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 400;
+}
+@utility font-headline-md {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+@utility text-headline-md {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+@utility font-label-caps {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+@utility text-label-caps {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+@utility font-note-cell {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 500;
+}
+@utility text-note-cell {
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 500;
+}
+@utility font-body-md {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+@utility text-body-md {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-up {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+body {
+  background-color: #f9f9f9;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  height: 100vh;
+}
+
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+  display: none;
+}
+
