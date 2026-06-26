@@ -30,7 +30,7 @@ export function isValidMove(board: number[][], row: number, col: number, val: nu
 /**
  * 使用 Web Worker 异步生成具有唯一解的数独谜题，避免阻塞主线程。
  */
-export function generateSudokuAsync(difficulty: Difficulty): Promise<Cell[][]> {
+export function generateSudokuAsync(difficulty: Difficulty, seed?: number): Promise<Cell[][]> {
   return new Promise((resolve, reject) => {
     try {
       const worker = new Worker(
@@ -45,7 +45,7 @@ export function generateSudokuAsync(difficulty: Difficulty): Promise<Cell[][]> {
         reject(error);
         worker.terminate();
       };
-      worker.postMessage({ difficulty });
+      worker.postMessage({ difficulty, seed });
     } catch (err) {
       reject(err);
     }

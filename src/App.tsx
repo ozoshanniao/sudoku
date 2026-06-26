@@ -8,6 +8,7 @@ import DailyChallengeScreen from './components/DailyChallengeScreen';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import { generateSudokuAsync } from './utils/sudoku';
+import { getDailyChallengeConfig } from './utils/dailyChallenge';
 import { playSound } from './utils/audio';
 import { safeStorage } from './utils/storage';
 
@@ -185,19 +186,19 @@ export default function App() {
   const handlePlayDailyChallenge = async (dateStr: string) => {
     setActiveDailyDate(dateStr);
     
-    // Day of month determines difficulty of daily challenge
-    const day = parseInt(dateStr.split('-')[2]);
-    let diff: Difficulty = 'medium';
-    if (day % 4 === 0) diff = 'expert';
-    else if (day % 4 === 1) diff = 'easy';
-    else if (day % 4 === 2) diff = 'medium';
-    else if (day % 4 === 3) diff = 'hard';
+    let config;
+    try {
+      config = getDailyChallengeConfig(dateStr);
+    } catch (e) {
+      console.error(e);
+      return;
+    }
 
-    setGameDifficulty(diff);
+    setGameDifficulty(config.difficulty);
     setIsGenerating(true);
     try {
       // Generate board based on daily deterministic seed layout
-      const newBoard = await generateSudokuAsync(diff);
+      const newBoard = await generateSudokuAsync(config.difficulty, config.seed);
       setActiveBoard(newBoard);
       setSavedMistakesCount(0);
       setSavedSecondsElapsed(0);
