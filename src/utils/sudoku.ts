@@ -53,11 +53,46 @@ export function generateSudokuAsync(difficulty: Difficulty): Promise<Cell[][]> {
 }
 
 /**
+ * 验证整个数独盘面的初始状态是否合法（无冲突，9x9，数字1-9）。
+ */
+export function isValidBoard(grid: (number | null)[][]): boolean {
+  if (!Array.isArray(grid) || grid.length !== 9) return false;
+  
+  const rows = Array.from({ length: 9 }, () => new Set<number>());
+  const cols = Array.from({ length: 9 }, () => new Set<number>());
+  const boxes = Array.from({ length: 9 }, () => new Set<number>());
+
+  for (let r = 0; r < 9; r++) {
+    if (!Array.isArray(grid[r]) || grid[r].length !== 9) return false;
+    
+    for (let c = 0; c < 9; c++) {
+      const val = grid[r][c];
+      if (val === null || val === 0) continue;
+      if (typeof val !== 'number' || val < 1 || val > 9 || !Number.isInteger(val)) return false;
+
+      const boxIdx = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+
+      if (rows[r].has(val) || cols[c].has(val) || boxes[boxIdx].has(val)) {
+        return false;
+      }
+      rows[r].add(val);
+      cols[c].add(val);
+      boxes[boxIdx].add(val);
+    }
+  }
+  return true;
+}
+
+/**
  * 简单的回溯求解器，用于统计谜题的解数量（最多到 2，用于唯一解校验）。
  */
 export function solveSudoku(grid: (number | null)[][]): { solutions: number; grid: number[][] } {
   let solutionsCount = 0;
   let solvedGrid: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0));
+
+  if (!isValidBoard(grid)) {
+    return { solutions: 0, grid: solvedGrid };
+  }
 
   const puzzleArr: number[][] = grid.map(row => row.map(cell => cell || 0));
 

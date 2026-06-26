@@ -32,6 +32,44 @@ describe('Sudoku Logic - isValidMove', () => {
   });
 });
 
+describe('Sudoku Logic - solveSudoku pre-validation', () => {
+  it('should return 0 solutions for unsolvable boards with row conflicts (fast failure)', () => {
+    const grid: (number | null)[][] = Array.from({ length: 9 }, () => Array(9).fill(null));
+    grid[0][0] = 1;
+    grid[0][1] = 1; // Conflict in same row
+    const { solutions } = solveSudoku(grid);
+    expect(solutions).toBe(0);
+  });
+
+  it('should return 0 solutions for unsolvable boards with col conflicts (fast failure)', () => {
+    const grid: (number | null)[][] = Array.from({ length: 9 }, () => Array(9).fill(null));
+    grid[0][0] = 2;
+    grid[1][0] = 2; // Conflict in same col
+    const { solutions } = solveSudoku(grid);
+    expect(solutions).toBe(0);
+  });
+
+  it('should return 0 solutions for unsolvable boards with box conflicts (fast failure)', () => {
+    const grid: (number | null)[][] = Array.from({ length: 9 }, () => Array(9).fill(null));
+    grid[0][0] = 3;
+    grid[1][1] = 3; // Conflict in same 3x3 box
+    const { solutions } = solveSudoku(grid);
+    expect(solutions).toBe(0);
+  });
+
+  it('should return 0 solutions for boards with invalid structures or numbers', () => {
+    // Missing a row
+    const missingRowGrid = Array.from({ length: 8 }, () => Array(9).fill(null));
+    expect(solveSudoku(missingRowGrid as any).solutions).toBe(0);
+
+    // Invalid number
+    const invalidNumGrid = Array.from({ length: 9 }, () => Array(9).fill(null));
+    invalidNumGrid[0][0] = 10;
+    expect(solveSudoku(invalidNumGrid).solutions).toBe(0);
+  });
+});
+
+
 describe('Sudoku Logic - solveSudoku', () => {
   it('should successfully solve a valid incomplete board', () => {
     const grid: (number | null)[][] = [
