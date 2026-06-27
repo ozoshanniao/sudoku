@@ -13,16 +13,10 @@ import { playSound } from './utils/audio';
 import { safeStorage } from './utils/storage';
 import { updateProfileAfterCompletion, updateStatsAfterCompletion, GameCompletionContext } from './utils/playerProgress';
 import { formatLocalDateKey, getPreviousLocalDateKey } from './utils/localDate';
-import { normalizeSettings, normalizeProfile, normalizeStats, normalizeAutosave } from './utils/persistedState';
+import { normalizeProfile, normalizeStats, normalizeAutosave } from './utils/persistedState';
+import { useGameSettings } from './hooks/useGameSettings';
 
 // Initial state structures
-const DEFAULT_SETTINGS: GameSettings = {
-  soundEffects: true,
-  showTimer: true,
-  autoCheckMistakes: true,
-  limitMistakes: true,
-};
-
 const DEFAULT_PROFILE: Profile = {
   username: 'Sage Solver',
   xp: 450,
@@ -60,7 +54,7 @@ const DEFAULT_STATS: Stats = {
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('menu');
-  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+  const { settings, updateSettings: handleUpdateSettings } = useGameSettings();
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
   const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
 
@@ -78,16 +72,6 @@ export default function App() {
   // Load custom saved parameters from safeStorage upon mounting
   useEffect(() => {
     try {
-      const storedSettings = safeStorage.getItem('sudoku_settings');
-      if (storedSettings) {
-        try {
-          const parsed = JSON.parse(storedSettings);
-          setSettings(normalizeSettings(parsed, DEFAULT_SETTINGS));
-        } catch (e) {
-          console.warn('Invalid settings JSON', e);
-        }
-      }
-
       const storedProfile = safeStorage.getItem('sudoku_profile');
       if (storedProfile) {
         try {
@@ -129,12 +113,6 @@ export default function App() {
       console.warn('Local Storage load fail:', err);
     }
   }, []);
-
-  // Sync settings when modified
-  const handleUpdateSettings = (newSettings: GameSettings) => {
-    setSettings(newSettings);
-    safeStorage.setItem('sudoku_settings', JSON.stringify(newSettings));
-  };
 
   // Nav tab clicked handler
   const handleTabClick = (target: Screen) => {
