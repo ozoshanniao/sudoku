@@ -10,6 +10,7 @@ interface GameplayScreenProps {
   difficulty: Difficulty;
   settings: GameSettings;
   onGameCompleted: (timeSec: number, won: boolean, mistakes?: number) => void;
+  onPlayAgain?: (timeSec: number, mistakes?: number) => void | Promise<void>;
   onQuit: () => void;
   savedMistakes?: number;
   savedTime?: number;
@@ -20,6 +21,7 @@ export default function GameplayScreen({
   difficulty,
   settings,
   onGameCompleted,
+  onPlayAgain,
   onQuit,
   savedMistakes = 0,
   savedTime = 0,
@@ -33,6 +35,7 @@ export default function GameplayScreen({
   const [notesMode, setNotesMode] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isWon, setIsWon] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Undo stack: stores serialized forms of the board
   const [history, setHistory] = useState<string[]>([]);
@@ -295,7 +298,22 @@ export default function GameplayScreen({
     setNotesMode(false);
     setIsGameOver(false);
     setIsWon(false);
+    setIsSubmitting(false);
     setHistory([]);
+  };
+
+  const handleContinue = () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    onGameCompleted(time, true, mistakes);
+  };
+
+  const handlePlayAgainClick = () => {
+    if (isSubmitting) return;
+    if (onPlayAgain) {
+      setIsSubmitting(true);
+      onPlayAgain(time, mistakes);
+    }
   };
 
   const handleRestartGroup = () => {
@@ -630,11 +648,26 @@ export default function GameplayScreen({
             </p>
 
             <button
-              onClick={() => onGameCompleted(time, true, mistakes)}
-              className="w-full bg-secondary text-white py-4 rounded-xl font-bold text-sm tracking-widest hover:opacity-95 cursor-pointer shadow-md"
+              onClick={handleContinue}
+              disabled={isSubmitting}
+              className={`w-full py-4 rounded-xl font-bold text-sm tracking-widest shadow-md transition-all ${
+                isSubmitting ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-secondary text-white hover:opacity-95 cursor-pointer'
+              } ${onPlayAgain ? 'mb-3' : ''}`}
             >
               CONTINUE TO STATS
             </button>
+
+            {onPlayAgain && (
+              <button
+                onClick={handlePlayAgainClick}
+                disabled={isSubmitting}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm tracking-widest border-2 shadow-sm transition-all ${
+                  isSubmitting ? 'border-neutral-300 text-neutral-400 bg-neutral-100 cursor-not-allowed' : 'bg-white text-secondary border-secondary hover:bg-neutral-50 cursor-pointer'
+                }`}
+              >
+                PLAY AGAIN
+              </button>
+            )}
           </motion.div>
         </motion.div>
       )}

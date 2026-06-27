@@ -86,12 +86,7 @@ export default function App() {
   };
 
   // Game complete state triggers XP allocation & Stats logs
-  const handleGameCompleted = (timeSec: number, won: boolean, mistakesCount: number = 0) => {
-    if (!won) {
-      handleGameQuit();
-      return;
-    }
-
+  const executeCompletion = (timeSec: number, mistakesCount: number) => {
     const matchDayStr = new Date().toLocaleDateString(undefined, { weekday: 'long' });
     const nowIsoString = new Date().toISOString();
     const randomId = Math.random().toString();
@@ -113,10 +108,33 @@ export default function App() {
     };
 
     applyGameCompletion(context);
+  };
+
+  const handleGameCompleted = (timeSec: number, won: boolean, mistakesCount: number = 0) => {
+    if (!won) {
+      handleGameQuit();
+      return;
+    }
+
+    executeCompletion(timeSec, mistakesCount);
 
     // Clean active gameplay setup
     clearSession();
     setScreen('stats'); // Pivot immediately to performance screen for gratification
+  };
+
+  const handlePlayAgain = async (timeSec: number, mistakesCount: number = 0) => {
+    const currentDifficulty = gameDifficulty;
+    executeCompletion(timeSec, mistakesCount);
+    
+    clearSession();
+    
+    const success = await startGame(currentDifficulty);
+    if (success) {
+      setScreen('game');
+    } else {
+      setScreen('menu');
+    }
   };
 
   return (
@@ -229,6 +247,7 @@ export default function App() {
             difficulty={gameDifficulty}
             settings={settings}
             onGameCompleted={handleGameCompleted}
+            onPlayAgain={handlePlayAgain}
             onQuit={handleGameQuit}
             savedMistakes={savedMistakesCount}
             savedTime={savedSecondsElapsed}
