@@ -12,6 +12,7 @@ import { getDailyChallengeConfig } from './utils/dailyChallenge';
 import { playSound } from './utils/audio';
 import { safeStorage } from './utils/storage';
 import { updateProfileAfterCompletion, updateStatsAfterCompletion, GameCompletionContext } from './utils/playerProgress';
+import { formatLocalDateKey, getPreviousLocalDateKey } from './utils/localDate';
 
 // Initial state structures
 const DEFAULT_SETTINGS: GameSettings = {
@@ -239,8 +240,10 @@ export default function App() {
     const matchDayStr = new Date().toLocaleDateString(undefined, { weekday: 'long' });
     const nowIsoString = new Date().toISOString();
     const randomId = Math.random().toString();
-    const todayStr = '2026-06-22'; // Preserved hardcoded today date from original implementation
-    const yesterdayStr = '2026-06-21'; // Preserved hardcoded yesterday date from original implementation
+    
+    const now = new Date();
+    const todayStr = formatLocalDateKey(now);
+    const yesterdayStr = getPreviousLocalDateKey(now);
 
     const context: GameCompletionContext = {
       timeSec,
