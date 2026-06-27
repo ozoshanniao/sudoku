@@ -13,6 +13,7 @@ import { playSound } from './utils/audio';
 import { safeStorage } from './utils/storage';
 import { updateProfileAfterCompletion, updateStatsAfterCompletion, GameCompletionContext } from './utils/playerProgress';
 import { formatLocalDateKey, getPreviousLocalDateKey } from './utils/localDate';
+import { normalizeSettings, normalizeProfile, normalizeStats, normalizeAutosave } from './utils/persistedState';
 
 // Initial state structures
 const DEFAULT_SETTINGS: GameSettings = {
@@ -79,44 +80,47 @@ export default function App() {
     try {
       const storedSettings = safeStorage.getItem('sudoku_settings');
       if (storedSettings) {
-        const parsed = JSON.parse(storedSettings);
-        if (parsed) {
-          setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+        try {
+          const parsed = JSON.parse(storedSettings);
+          setSettings(normalizeSettings(parsed, DEFAULT_SETTINGS));
+        } catch (e) {
+          console.warn('Invalid settings JSON', e);
         }
       }
 
       const storedProfile = safeStorage.getItem('sudoku_profile');
       if (storedProfile) {
-        const parsed = JSON.parse(storedProfile);
-        if (parsed) {
-          setProfile({
-            ...DEFAULT_PROFILE,
-            ...parsed,
-            completedDays: Array.isArray(parsed.completedDays) ? parsed.completedDays : DEFAULT_PROFILE.completedDays,
-          });
+        try {
+          const parsed = JSON.parse(storedProfile);
+          setProfile(normalizeProfile(parsed, DEFAULT_PROFILE));
+        } catch (e) {
+          console.warn('Invalid profile JSON', e);
         }
       }
 
       const storedStats = safeStorage.getItem('sudoku_stats');
       if (storedStats) {
-        const parsed = JSON.parse(storedStats);
-        if (parsed) {
-          setStats({
-            ...DEFAULT_STATS,
-            ...parsed,
-            bestTimes: { ...DEFAULT_STATS.bestTimes, ...parsed.bestTimes },
-            weeklyActivity: { ...DEFAULT_STATS.weeklyActivity, ...parsed.weeklyActivity },
-            recentGames: Array.isArray(parsed.recentGames) ? parsed.recentGames : DEFAULT_STATS.recentGames,
-          });
+        try {
+          const parsed = JSON.parse(storedStats);
+          setStats(normalizeStats(parsed, DEFAULT_STATS));
+        } catch (e) {
+          console.warn('Invalid stats JSON', e);
         }
       }
 
-      const autosave = safeStorage.getItem('sudoku_autosave');
-      if (autosave) {
-        const parsedObj = JSON.parse(autosave);
-        if (parsedObj && Array.isArray(parsedObj.board)) {
-          setHasSavedGame(true);
-        } else {
+      const autosaveStr = safeStorage.getItem('sudoku_autosave');
+      if (autosaveStr) {
+        try {
+          const parsedObj = JSON.parse(autosaveStr);
+          const normalizedAutosave = normalizeAutosave(parsedObj);
+          if (normalizedAutosave) {
+            setHasSavedGame(true);
+          } else {
+            setHasSavedGame(false);
+            safeStorage.removeItem('sudoku_autosave');
+          }
+        } catch (e) {
+          console.warn('Invalid autosave JSON', e);
           setHasSavedGame(false);
           safeStorage.removeItem('sudoku_autosave');
         }
@@ -166,11 +170,12 @@ export default function App() {
       const autosaveStr = safeStorage.getItem('sudoku_autosave');
       if (autosaveStr) {
         const parsedObj = JSON.parse(autosaveStr);
-        if (parsedObj && Array.isArray(parsedObj.board)) {
-          setGameDifficulty(parsedObj.difficulty || 'medium');
-          setActiveBoard(parsedObj.board);
-          setSavedMistakesCount(typeof parsedObj.mistakes === 'number' ? parsedObj.mistakes : 0);
-          setSavedSecondsElapsed(typeof parsedObj.time === 'number' ? parsedObj.time : 0);
+        const normalized = normalizeAutosave(parsedObj);
+        if (normalized) {
+          setGameDifficulty(normalized.difficulty);
+          setActiveBoard(normalized.board);
+          setSavedMistakesCount(normalized.mistakes);
+          setSavedSecondsElapsed(normalized.time);
           setScreen('game');
         } else {
           setHasSavedGame(false);
@@ -220,7 +225,8 @@ export default function App() {
       const autosaveStr = safeStorage.getItem('sudoku_autosave');
       if (autosaveStr) {
         const parsed = JSON.parse(autosaveStr);
-        setHasSavedGame(!!(parsed && Array.isArray(parsed.board)));
+        const normalized = normalizeAutosave(parsed);
+        setHasSavedGame(!!normalized);
       } else {
         setHasSavedGame(false);
       }
