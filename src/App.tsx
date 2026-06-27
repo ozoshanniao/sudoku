@@ -7,15 +7,12 @@ import GameplayScreen from './components/GameplayScreen';
 import DailyChallengeScreen from './components/DailyChallengeScreen';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
-import { generateSudokuAsync } from './utils/sudoku';
-import { getDailyChallengeConfig } from './utils/dailyChallenge';
 import { playSound } from './utils/audio';
-import { safeStorage } from './utils/storage';
 import { GameCompletionContext } from './utils/playerProgress';
 import { formatLocalDateKey, getPreviousLocalDateKey } from './utils/localDate';
-import { normalizeAutosave } from './utils/persistedState';
 import { useGameSettings } from './hooks/useGameSettings';
 import { usePlayerProgressState } from './hooks/usePlayerProgressState';
+import { useSudokuSession } from './hooks/useSudokuSession';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('menu');
@@ -30,39 +27,22 @@ export default function App() {
   } = usePlayerProgressState();
 
   // Active game states
-  const [gameDifficulty, setGameDifficulty] = useState<Difficulty>('medium');
-  const [activeBoard, setActiveBoard] = useState<Cell[][] | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [hasSavedGame, setHasSavedGame] = useState(false);
-  const [savedMistakesCount, setSavedMistakesCount] = useState(0);
-  const [savedSecondsElapsed, setSavedSecondsElapsed] = useState(0);
-  const [activeDailyDate, setActiveDailyDate] = useState<string | null>(null);
-
-  // Load custom saved parameters from safeStorage upon mounting
-  useEffect(() => {
-    try {
-
-      const autosaveStr = safeStorage.getItem('sudoku_autosave');
-      if (autosaveStr) {
-        try {
-          const parsedObj = JSON.parse(autosaveStr);
-          const normalizedAutosave = normalizeAutosave(parsedObj);
-          if (normalizedAutosave) {
-            setHasSavedGame(true);
-          } else {
-            setHasSavedGame(false);
-            safeStorage.removeItem('sudoku_autosave');
-          }
-        } catch (e) {
-          console.warn('Invalid autosave JSON', e);
-          setHasSavedGame(false);
-          safeStorage.removeItem('sudoku_autosave');
-        }
-      }
-    } catch (err) {
-      console.warn('Local Storage load fail:', err);
-    }
-  }, []);
+  const {
+    gameDifficulty,
+    setGameDifficulty,
+    activeBoard,
+    isGenerating,
+    hasSavedGame,
+    savedMistakesCount,
+    savedSecondsElapsed,
+    activeDailyDate,
+    setActiveDailyDate,
+    startGame,
+    resumeGame,
+    startDailyChallenge,
+    quitGame,
+    clearSession,
+  } = useSudokuSession();
 
   // Nav tab clicked handler
   const handleTabClick = (target: Screen) => {
@@ -78,89 +58,30 @@ export default function App() {
 
   // Prepares the board matching the difficulty configuration
   const handleConfirmStart = async () => {
-    setIsGenerating(true);
-    try {
-      const newBoard = await generateSudokuAsync(gameDifficulty);
-      setActiveBoard(newBoard);
-      setSavedMistakesCount(0);
-      setSavedSecondsElapsed(0);
+    const success = await startGame(gameDifficulty);
+    if (success) {
       setScreen('game');
-    } catch (error) {
-      console.error('Failed to generate sudoku:', error);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
   // Resumes previous board state saved automatically
   const handleResumePuzzle = () => {
-    try {
-      const autosaveStr = safeStorage.getItem('sudoku_autosave');
-      if (autosaveStr) {
-        const parsedObj = JSON.parse(autosaveStr);
-        const normalized = normalizeAutosave(parsedObj);
-        if (normalized) {
-          setGameDifficulty(normalized.difficulty);
-          setActiveBoard(normalized.board);
-          setSavedMistakesCount(normalized.mistakes);
-          setSavedSecondsElapsed(normalized.time);
-          setScreen('game');
-        } else {
-          setHasSavedGame(false);
-          safeStorage.removeItem('sudoku_autosave');
-        }
-      }
-    } catch (e) {
-      console.error(e);
-      setHasSavedGame(false);
-      safeStorage.removeItem('sudoku_autosave');
+    const success = resumeGame();
+    if (success) {
+      setScreen('game');
     }
   };
 
   // Connects daily challenge dates as custom deterministic games
   const handlePlayDailyChallenge = async (dateStr: string) => {
-    setActiveDailyDate(dateStr);
-    
-    let config;
-    try {
-      config = getDailyChallengeConfig(dateStr);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-
-    setGameDifficulty(config.difficulty);
-    setIsGenerating(true);
-    try {
-      // Generate board based on daily deterministic seed layout
-      const newBoard = await generateSudokuAsync(config.difficulty, config.seed);
-      setActiveBoard(newBoard);
-      setSavedMistakesCount(0);
-      setSavedSecondsElapsed(0);
+    const success = await startDailyChallenge(dateStr);
+    if (success) {
       setScreen('game');
-    } catch (error) {
-      console.error('Failed to generate daily challenge sudoku:', error);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
   const handleGameQuit = () => {
-    setActiveBoard(null);
-    setActiveDailyDate(null);
-    // Refresh autosave display option
-    try {
-      const autosaveStr = safeStorage.getItem('sudoku_autosave');
-      if (autosaveStr) {
-        const parsed = JSON.parse(autosaveStr);
-        const normalized = normalizeAutosave(parsed);
-        setHasSavedGame(!!normalized);
-      } else {
-        setHasSavedGame(false);
-      }
-    } catch (e) {
-      setHasSavedGame(false);
-    }
+    quitGame();
     setScreen('menu');
   };
 
@@ -194,9 +115,7 @@ export default function App() {
     applyGameCompletion(context);
 
     // Clean active gameplay setup
-    setActiveBoard(null);
-    setActiveDailyDate(null);
-    setHasSavedGame(false);
+    clearSession();
     setScreen('stats'); // Pivot immediately to performance screen for gratification
   };
 
