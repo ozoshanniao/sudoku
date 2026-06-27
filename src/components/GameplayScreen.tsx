@@ -103,6 +103,33 @@ export default function GameplayScreen({
         handleUndo();
       } else if (e.key.toLowerCase() === 'h') {
         handleHint();
+      } else if ((import.meta as any).env.DEV && e.ctrlKey && e.shiftKey && e.key === 'Enter') {
+        // Dev-only auto-complete shortcut
+        const activeElement = document.activeElement;
+        const isInputFocused = activeElement && (
+          activeElement.tagName === 'INPUT' || 
+          activeElement.tagName === 'TEXTAREA' || 
+          activeElement.hasAttribute('contenteditable')
+        );
+        if (!isInputFocused) {
+          e.preventDefault();
+          const newBoard = JSON.parse(JSON.stringify(board)) as Cell[][];
+          let changed = false;
+          newBoard.forEach(row => {
+            row.forEach(cell => {
+              if (!cell.isClue && cell.value !== cell.solvedValue) {
+                cell.value = cell.solvedValue;
+                cell.notes = [];
+                cell.isInvalid = false;
+                changed = true;
+              }
+            });
+          });
+          if (changed) {
+            setBoard(newBoard);
+            checkGameCompletion(newBoard);
+          }
+        }
       }
     };
 
@@ -288,7 +315,12 @@ export default function GameplayScreen({
   return (
     <div className="flex-grow flex flex-col justify-start px-2 py-4 max-w-md mx-auto w-full select-none animate-fade-in pb-2">
       {/* Design Header: menu Sudoku settings */}
-      <div className="flex justify-between items-center w-full px-4 py-3 mb-4 border-b border-[#eeeeee]">
+      <div className="flex justify-between items-center w-full px-4 py-3 mb-4 border-b border-[#eeeeee] relative">
+        {(import.meta as any).env.DEV && (
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-neutral-400 font-mono tracking-tighter whitespace-nowrap opacity-50 pointer-events-none">
+            Dev: Ctrl + Shift + Enter 自动完成
+          </div>
+        )}
         <button
           onClick={handleSaveAndQuitGroup}
           aria-label="Menu"
