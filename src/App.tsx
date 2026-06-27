@@ -11,6 +11,7 @@ import { generateSudokuAsync } from './utils/sudoku';
 import { getDailyChallengeConfig } from './utils/dailyChallenge';
 import { playSound } from './utils/audio';
 import { safeStorage } from './utils/storage';
+import { updateProfileAfterCompletion, updateStatsAfterCompletion, GameCompletionContext } from './utils/playerProgress';
 
 // Initial state structures
 const DEFAULT_SETTINGS: GameSettings = {
@@ -235,107 +236,29 @@ export default function App() {
       return;
     }
 
-    const currentProfile = {
-      ...DEFAULT_PROFILE,
-      ...profile,
-      completedDays: Array.isArray(profile.completedDays) ? profile.completedDays : DEFAULT_PROFILE.completedDays,
+    const matchDayStr = new Date().toLocaleDateString(undefined, { weekday: 'long' });
+    const nowIsoString = new Date().toISOString();
+    const randomId = Math.random().toString();
+    const todayStr = '2026-06-22'; // Preserved hardcoded today date from original implementation
+    const yesterdayStr = '2026-06-21'; // Preserved hardcoded yesterday date from original implementation
+
+    const context: GameCompletionContext = {
+      timeSec,
+      mistakesCount,
+      gameDifficulty,
+      activeDailyDate,
+      todayStr,
+      yesterdayStr,
+      matchDayStr,
+      nowIsoString,
+      randomId,
     };
 
-    const currentStats = {
-      ...DEFAULT_STATS,
-      ...stats,
-      bestTimes: { ...DEFAULT_STATS.bestTimes, ...stats.bestTimes },
-      weeklyActivity: { ...DEFAULT_STATS.weeklyActivity, ...stats.weeklyActivity },
-      recentGames: Array.isArray(stats.recentGames) ? stats.recentGames : DEFAULT_STATS.recentGames,
-    };
-
-    // Allocate Experience Points depending on difficulty
-    let xpAllocated = 100;
-    if (gameDifficulty === 'medium') xpAllocated = 200;
-    else if (gameDifficulty === 'hard') xpAllocated = 300;
-    else if (gameDifficulty === 'expert') xpAllocated = 400;
-
-    // Daily bonus
-    if (activeDailyDate) xpAllocated += 100;
-
-    const newXp = currentProfile.xp + xpAllocated;
-    let newLevel = currentProfile.level;
-    const levelThreshold = currentProfile.level * 1000;
-    
-    if (newXp >= levelThreshold) {
-      newLevel += 1;
-    }
-
-    // Update streak tracking
-    let newStreak = currentProfile.streak;
-    const todayStr = '2026-06-22';
-    const lastStr = currentProfile.lastPlayedDate;
-    
-    if (lastStr !== todayStr) {
-      if (lastStr === '2026-06-21') {
-        newStreak += 1;
-      } else if (lastStr !== '2026-06-22') {
-        newStreak = 1;
-      }
-    }
-
-    // Update completed daily challenge list
-    let updatedCompletedDays = [...currentProfile.completedDays];
-    if (activeDailyDate && !updatedCompletedDays.includes(activeDailyDate)) {
-      updatedCompletedDays.push(activeDailyDate);
-    }
-
-    const updatedProfile: Profile = {
-      ...currentProfile,
-      xp: newXp >= levelThreshold ? newXp - levelThreshold : newXp,
-      level: newLevel,
-      streak: newStreak,
-      lastPlayedDate: todayStr,
-      completedDays: updatedCompletedDays,
-    };
-
+    const updatedProfile = updateProfileAfterCompletion(profile, context);
     setProfile(updatedProfile);
     safeStorage.setItem('sudoku_profile', JSON.stringify(updatedProfile));
 
-    // Update global game overview statistics
-    const updatedGamesPlayed = currentStats.gamesPlayed + 1;
-    const updatedGamesWon = currentStats.gamesWon + 1;
-
-    // Best Time calculator
-    const currentBest = currentStats.bestTimes[gameDifficulty];
-    const newBest = currentBest === null ? timeSec : Math.min(currentBest, timeSec);
-
-    const matchDayStr = new Date().toLocaleDateString(undefined, { weekday: 'long' });
-    const currentDayCount = currentStats.weeklyActivity[matchDayStr] || 0;
-
-    const updatedRecent = [
-      {
-        id: Math.random().toString(),
-        difficulty: gameDifficulty,
-        time: timeSec,
-        date: new Date().toISOString(),
-        won: true,
-        xpEarned: xpAllocated,
-        mistakes: mistakesCount,
-      },
-      ...currentStats.recentGames,
-    ];
-
-    const updatedStats: Stats = {
-      ...currentStats,
-      gamesPlayed: updatedGamesPlayed,
-      gamesWon: updatedGamesWon,
-      bestTimes: {
-        ...currentStats.bestTimes,
-        [gameDifficulty]: newBest,
-      },
-      weeklyActivity: {
-        ...currentStats.weeklyActivity,
-        [matchDayStr]: currentDayCount + 1,
-      },
-      recentGames: updatedRecent.slice(0, 20), // prune to max 20 logs
-    };
-
+    const updatedStats = updateStatsAfterCompletion(stats, context);
     setStats(updatedStats);
     safeStorage.setItem('sudoku_stats', JSON.stringify(updatedStats));
 
