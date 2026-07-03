@@ -154,17 +154,15 @@ export function ratePuzzleDifficulty(initialGrid: (number | null)[][]): number {
             if (sameRow) {
               // Exclude val from this row in other boxes
               for (let c = 0; c < 9; c++) {
-                if (Math.floor(c / 3) * 3 !== boxCol && grid[firstRow][c] === 0) {
+                if (Math.floor(c / 3) * 3 !== boxCol && grid[firstRow][c] === 0 && getCandidates(grid, firstRow, c).includes(val)) {
                   score += 4;
-                  changed = true;
                 }
               }
             } else if (sameCol) {
               // Exclude val from this col in other boxes
               for (let r = 0; r < 9; r++) {
-                if (Math.floor(r / 3) * 3 !== boxRow && grid[r][firstCol] === 0) {
+                if (Math.floor(r / 3) * 3 !== boxRow && grid[r][firstCol] === 0 && getCandidates(grid, r, firstCol).includes(val)) {
                   score += 4;
-                  changed = true;
                 }
               }
             }
