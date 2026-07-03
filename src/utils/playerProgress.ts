@@ -36,7 +36,14 @@ export function updateProfileAfterCompletion(profile: Profile, context: GameComp
     completedDays: Array.isArray(profile.completedDays) ? profile.completedDays : [],
   };
 
-  const xpEarned = calculateXpReward(context.gameDifficulty, !!context.activeDailyDate);
+  const isFirstDailyCompletion = !!(
+    context.activeDailyDate &&
+    typeof context.activeDailyDate === 'string' &&
+    context.activeDailyDate.length > 0 &&
+    !currentProfile.completedDays.includes(context.activeDailyDate)
+  );
+
+  const xpEarned = calculateXpReward(context.gameDifficulty, isFirstDailyCompletion);
   const newXp = currentProfile.xp + xpEarned;
   
   let newLevel = currentProfile.level;
@@ -60,7 +67,7 @@ export function updateProfileAfterCompletion(profile: Profile, context: GameComp
   }
 
   let updatedCompletedDays = [...currentProfile.completedDays];
-  if (context.activeDailyDate && !updatedCompletedDays.includes(context.activeDailyDate)) {
+  if (isFirstDailyCompletion && context.activeDailyDate) {
     updatedCompletedDays.push(context.activeDailyDate);
   }
 
