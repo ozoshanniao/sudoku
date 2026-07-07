@@ -9,8 +9,6 @@ interface ProfileScreenProps {
   stats: Stats;
   onUpdateName: (name: string) => void;
   onUpdateAvatar: (avatar: string) => void;
-  onClearStats: () => void;
-  onGoToMenu: () => void;
   soundEffects: boolean;
 }
 
@@ -19,13 +17,10 @@ export default function ProfileScreen({
   stats,
   onUpdateName,
   onUpdateAvatar,
-  onClearStats,
-  onGoToMenu,
   soundEffects,
 }: ProfileScreenProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(profile?.username || 'Solver');
-  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [, startTransition] = useTransition();
 
   const avatars = ['🧩', '🧠', '⚡', '🦉', '🔮', '🛡️', '🎯', '🪐'];
@@ -207,63 +202,6 @@ export default function ProfileScreen({
         </div>
       </div>
 
-      {/* Danger Zone / System settings */}
-      <div className="bg-white p-3 rounded-xl border border-red-100 shadow-sm mt-3">
-        <h4 className="text-[10px] font-black text-red-600 flex items-center gap-1 mb-1.5 select-none uppercase tracking-wider">
-          Danger Zone
-        </h4>
-        <p className="text-[9px] text-[#555a5b] leading-tight mb-3">
-          Resetting your statistics will permanently clear your level progress, XP, streaks, and achievements.
-        </p>
-        <button
-          onClick={() => {
-            if (soundEffects) playSound('click');
-            setIsConfirmingReset(true);
-          }}
-          className="w-full border border-red-200 hover:bg-red-50 active:bg-red-100 text-red-600 py-2.5 rounded-xl font-bold text-xs tracking-wider cursor-pointer transition-all duration-200 text-center"
-        >
-          Reset All Statistics
-        </button>
-      </div>
-
-      {/* Reset Confirmation Dialog Modal */}
-      {isConfirmingReset && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-6 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl border border-red-100 animate-scale-up">
-            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-6 h-6 rotate-180" />
-            </div>
-            <h3 className="text-lg font-bold text-[#121212] mb-2 select-none">
-              Reset All Progress?
-            </h3>
-            <p className="text-xs text-[#555a5b] leading-relaxed mb-6 select-none">
-              This will permanently erase all your stats, levels, streaks, completed daily challenges, and achievements. This action is irreversible.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  if (soundEffects) playSound('click');
-                  setIsConfirmingReset(false);
-                }}
-                className="flex-1 bg-[#eeeeee] hover:bg-gray-200 text-primary py-3 rounded-xl font-bold text-xs tracking-wider transition-all duration-200 cursor-pointer"
-              >
-                CANCEL
-              </button>
-              <button
-                onClick={() => {
-                  if (soundEffects) playSound('click');
-                  onClearStats();
-                  setIsConfirmingReset(false);
-                  onGoToMenu();
-                }}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold text-xs tracking-wider transition-all duration-200 cursor-pointer shadow-md"
-              >
-                RESET DATA
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 }

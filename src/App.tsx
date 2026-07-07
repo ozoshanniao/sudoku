@@ -8,6 +8,7 @@ import DailyChallengeScreen from './components/DailyChallengeScreen';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import { playSound } from './utils/audio';
+import SettingsScreen from './components/SettingsScreen';
 import { GameCompletionContext } from './utils/playerProgress';
 import { formatLocalDateKey, getPreviousLocalDateKey } from './utils/localDate';
 import { useGameSettings } from './hooks/useGameSettings';
@@ -138,7 +139,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#fdfdfd] text-[#1a1c1c] select-none animate-fade-in">
+    <div className="min-h-dvh w-full flex flex-col md:flex-row bg-[#fdfdfd] text-[#1a1c1c] select-none">
       {/* Desktop NavigationDrawer (Visible on md and up) */}
       {screen !== 'game' && (
         <aside className="hidden md:flex flex-col p-6 gap-4 h-full w-80 fixed left-0 top-0 z-[60] bg-white border-r-2 border-primary">
@@ -190,6 +191,13 @@ export default function App() {
               <User className={`w-5 h-5 ${screen === 'profile' ? 'text-secondary' : ''}`} />
               <span>Profile</span>
             </button>
+            <button
+              onClick={() => handleTabClick('settings')}
+              className={'mt-auto flex items-center gap-4 px-4 py-3 rounded transition-all duration-200 text-left cursor-pointer font-body-md text-body-md ' + (screen === 'settings' ? 'bg-surface-container-low text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-variant hover:text-primary')}
+            >
+              <Settings className={'w-5 h-5 ' + (screen === 'settings' ? 'text-secondary' : '')} />
+              <span>Settings</span>
+            </button>
           </nav>
         </aside>
       )}
@@ -209,9 +217,9 @@ export default function App() {
               Sudoku
             </h1>
             <button
-              onClick={() => handleTabClick('difficulty-settings')}
+              onClick={() => handleTabClick('settings')}
               aria-label="Settings"
-              className="text-primary hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center"
+              className={'hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center ' + (screen === 'settings' ? 'bg-secondary/10 text-secondary' : 'text-primary')}
             >
               <Settings className="w-5 h-5" />
             </button>
@@ -220,7 +228,7 @@ export default function App() {
       )}
 
       {/* Main Screen Canvas Panel */}
-      <main className={`flex-grow flex flex-col w-full relative bg-[#fdfdfd] ${screen !== 'game' ? 'pb-16 md:pb-6 md:pl-80' : 'pb-2'}`}>
+      <main className={`flex-grow flex flex-col w-full relative bg-[#fdfdfd] ${screen !== 'game' ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-6 md:pl-80' : 'pb-2'}`}>
         {screen === 'menu' && (
           <MenuScreen
             onStartNewGame={handleTriggerStartNew}
@@ -236,8 +244,16 @@ export default function App() {
             difficulty={gameDifficulty}
             onChangeDifficulty={setGameDifficulty}
             settings={settings}
-            onChangeSettings={handleUpdateSettings}
             onConfirmStartGame={handleConfirmStart}
+          />
+        )}
+
+        {screen === 'settings' && (
+          <SettingsScreen
+            settings={settings}
+            onChangeSettings={handleUpdateSettings}
+            onClearStats={handleClearStats}
+            onResetComplete={() => setScreen('menu')}
           />
         )}
 
@@ -275,8 +291,6 @@ export default function App() {
             stats={stats}
             onUpdateName={handleUpdateName}
             onUpdateAvatar={handleUpdateAvatar}
-            onClearStats={handleClearStats}
-            onGoToMenu={() => setScreen('menu')}
             soundEffects={settings.soundEffects}
           />
         )}
@@ -284,7 +298,7 @@ export default function App() {
 
       {/* Mobile Bottom Navigation Bar (Hidden on md and up) */}
       {screen !== 'game' && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center h-16 bg-white/95 backdrop-blur-md border-t border-[#eeeeee] px-4 select-none pb-safe">
+        <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 flex justify-around items-center h-[calc(4rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-md border-t border-[#eeeeee] px-4 pb-[env(safe-area-inset-bottom)] select-none">
           {/* PLAY */}
           <button
             onClick={() => handleTabClick('menu')}

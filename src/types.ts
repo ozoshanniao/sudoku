@@ -1,6 +1,6 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
-export type Screen = 'menu' | 'difficulty-settings' | 'game' | 'daily' | 'stats' | 'profile';
+export type Screen = 'menu' | 'difficulty-settings' | 'settings' | 'game' | 'daily' | 'stats' | 'profile';
 
 export interface Cell {
   row: number;

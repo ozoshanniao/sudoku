@@ -1,5 +1,5 @@
 import React, { startTransition } from 'react';
-import { Smile, BarChart2, AlertTriangle, Flame, Volume2, Timer, CheckCircle, Play, AlertCircle } from 'lucide-react';
+import { Smile, BarChart2, AlertTriangle, Flame, Play } from 'lucide-react';
 import { Difficulty, GameSettings } from '../types';
 import { playSound } from '../utils/audio';
 import { motion } from 'motion/react';
@@ -8,7 +8,6 @@ interface DifficultySettingsScreenProps {
   difficulty: Difficulty;
   onChangeDifficulty: (diff: Difficulty) => void;
   settings: GameSettings;
-  onChangeSettings: (settings: GameSettings) => void;
   onConfirmStartGame: () => void;
 }
 
@@ -16,7 +15,6 @@ export default function DifficultySettingsScreen({
   difficulty,
   onChangeDifficulty,
   settings,
-  onChangeSettings,
   onConfirmStartGame,
 }: DifficultySettingsScreenProps) {
   const difficulties: { val: Difficulty; label: string; icon: React.ReactNode }[] = [
@@ -47,26 +45,6 @@ export default function DifficultySettingsScreen({
     onChangeDifficulty(val);
   };
 
-  const toggleSound = () => {
-    const newSettings = { ...settings, soundEffects: !settings.soundEffects };
-    if (newSettings.soundEffects) playSound('click');
-    onChangeSettings(newSettings);
-  };
-
-  const toggleTimer = () => {
-    if (settings.soundEffects) playSound('click');
-    onChangeSettings({ ...settings, showTimer: !settings.showTimer });
-  };
-
-  const toggleAutoCheck = () => {
-    if (settings.soundEffects) playSound('click');
-    onChangeSettings({ ...settings, autoCheckMistakes: !settings.autoCheckMistakes });
-  };
-
-  const toggleLimitMistakes = () => {
-    if (settings.soundEffects) playSound('click');
-    onChangeSettings({ ...settings, limitMistakes: !settings.limitMistakes });
-  };
 
   const handleConfirmGroup = () => {
     if (settings.soundEffects) playSound('click');
@@ -107,100 +85,6 @@ export default function DifficultySettingsScreen({
               </button>
             );
           })}
-        </div>
-      </section>
-
-      {/* Game Settings */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-headline-md text-headline-md text-primary select-none pb-2">Game Settings</h2>
-        <div className="flex flex-col gap-2 bg-transparent">
-          {/* Sound Toggle */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
-            <div className="flex items-center gap-4">
-              <Volume2 className="w-5 h-5 text-[#444748]" />
-              <span className="font-body-md text-body-md text-on-surface select-none">Sound Effects</span>
-            </div>
-            
-            <button
-              onClick={toggleSound}
-              className={`w-12 h-6 shrink-0 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-300 ${
-                settings.soundEffects ? 'bg-secondary' : 'bg-[#c4c7c7]'
-              }`}
-              id="sound_toggle_action"
-            >
-              <div
-                className={`bg-white w-5 h-5 rounded-full shadow-sm transform transition-transform duration-300 ${
-                  settings.soundEffects ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Show Timer Toggle */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
-            <div className="flex items-center gap-4">
-              <Timer className="w-5 h-5 text-[#444748]" />
-              <span className="font-body-md text-body-md text-on-surface select-none">Show Timer</span>
-            </div>
-            
-            <button
-              onClick={toggleTimer}
-              className={`w-12 h-6 shrink-0 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-300 ${
-                settings.showTimer ? 'bg-secondary' : 'bg-[#c4c7c7]'
-              }`}
-              id="timer_toggle_action"
-            >
-              <div
-                className={`bg-white w-5 h-5 rounded-full shadow-sm transform transition-transform duration-300 ${
-                  settings.showTimer ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Auto check Mistakes Toggle */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
-            <div className="flex items-center gap-4">
-              <CheckCircle className="w-5 h-5 text-[#444748]" />
-              <span className="font-body-md text-body-md text-on-surface select-none">Auto-check Mistakes</span>
-            </div>
-            
-            <button
-              onClick={toggleAutoCheck}
-              className={`w-12 h-6 shrink-0 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-300 ${
-                settings.autoCheckMistakes ? 'bg-secondary' : 'bg-[#c4c7c7]'
-              }`}
-              id="autocheck_toggle_action"
-            >
-              <div
-                className={`bg-white w-5 h-5 rounded-full shadow-sm transform transition-transform duration-300 ${
-                  settings.autoCheckMistakes ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Limit Mistakes Toggle */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
-            <div className="flex items-center gap-4">
-              <AlertCircle className="w-5 h-5 text-[#444748]" />
-              <span className="font-body-md text-body-md text-on-surface select-none">Limit Mistakes (3 Failures)</span>
-            </div>
-            
-            <button
-              onClick={toggleLimitMistakes}
-              className={`w-12 h-6 shrink-0 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-300 ${
-                settings.limitMistakes !== false ? 'bg-secondary' : 'bg-[#c4c7c7]'
-              }`}
-              id="limit_mistakes_toggle_action"
-            >
-              <div
-                className={`bg-white w-5 h-5 rounded-full shadow-sm transform transition-transform duration-300 ${
-                  settings.limitMistakes !== false ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
         </div>
       </section>
 
