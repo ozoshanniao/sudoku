@@ -14,6 +14,7 @@ export default function DailyChallengeScreen({
   onPlayDailyChallenge,
   soundEffects,
 }: DailyChallengeScreenProps) {
+  const safeCompletedDays = Array.isArray(completedDays) ? completedDays : [];
   const today = new Date();
 
   // Calendar browsing states (defaults to current year/month)
@@ -93,13 +94,13 @@ export default function DailyChallengeScreen({
     });
   };
 
-  const isChallengeCompleted = completedDays.includes(selectedDateStr);
+  const isChallengeCompleted = safeCompletedDays.includes(selectedDateStr);
 
   // Compute solved challenges count for the viewed month
   const completedDaysCountThisMonth = useMemo(() => {
     const prefix = `${viewYear}-${(viewMonthIdx + 1).toString().padStart(2, '0')}`;
-    return completedDays.filter((d) => d.startsWith(prefix)).length;
-  }, [completedDays, viewYear, viewMonthIdx]);
+    return safeCompletedDays.filter((d) => d.startsWith(prefix)).length;
+  }, [safeCompletedDays, viewYear, viewMonthIdx]);
 
   return (
     <motion.div
@@ -159,7 +160,7 @@ export default function DailyChallengeScreen({
             }
 
             const dateStr = formatDateStr(viewYear, viewMonthIdx, day);
-            const isCompleted = completedDays.includes(dateStr);
+            const isCompleted = safeCompletedDays.includes(dateStr);
             const isSelected = selectedDateStr === dateStr;
 
             const checkDateReset = new Date(viewYear, viewMonthIdx, day);

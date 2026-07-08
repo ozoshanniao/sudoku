@@ -18,7 +18,8 @@ export default function MenuScreen({
   streak,
   soundEffects,
 }: MenuScreenProps) {
-  const dots = Array.from({ length: 7 }, (_, i) => i < (streak % 8 === 0 && streak > 0 ? 7 : streak % 7));
+  const safeStreak = Number.isFinite(streak) && streak > 0 ? Math.floor(streak) : 0;
+  const dots = Array.from({ length: 7 }, (_, i) => i < (safeStreak % 8 === 0 && safeStreak > 0 ? 7 : safeStreak % 7));
 
   const handleStartGroup = () => {
     if (soundEffects) playSound('click');
@@ -87,7 +88,7 @@ export default function MenuScreen({
       {/* Quick stats/info */}
       <div className="text-center flex flex-col items-center">
         <span className="font-note-cell text-note-cell text-on-surface-variant uppercase tracking-[0.15em] select-none">
-          Current Streak: {streak} {streak === 1 ? 'Day' : 'Days'}
+          Current Streak: {safeStreak} {safeStreak === 1 ? 'Day' : 'Days'}
         </span>
         <div className="flex gap-2 mt-4" id="streak-dots">
           {dots.map((filled, idx) => (

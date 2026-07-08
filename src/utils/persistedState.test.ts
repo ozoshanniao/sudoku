@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { normalizeSettings, normalizeProfile, normalizeStats, normalizeAutosave } from './persistedState';
 import { GameSettings, Profile, Stats, Cell } from '../types';
+import { DEFAULT_PROFILE, DEFAULT_STATS } from '../hooks/usePlayerProgressState';
 
 describe('Persisted State Normalization', () => {
   describe('normalizeSettings', () => {
@@ -77,6 +78,28 @@ describe('Persisted State Normalization', () => {
       weeklyActivity: { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0, Saturday: 0, Sunday: 0 },
       recentGames: [],
     };
+
+    it('should keep production defaults clean for new users', () => {
+      expect(DEFAULT_PROFILE).toEqual({
+        username: 'Player',
+        xp: 0,
+        level: 1,
+        streak: 0,
+        lastPlayedDate: null,
+        completedDays: [],
+        avatar: '🧩',
+      });
+
+      expect(normalizeProfile(null, DEFAULT_PROFILE)).toEqual(DEFAULT_PROFILE);
+      expect(normalizeProfile(undefined, DEFAULT_PROFILE)).toEqual(DEFAULT_PROFILE);
+      expect(DEFAULT_STATS).toEqual(defaults);
+      expect(normalizeStats(null, DEFAULT_STATS)).toEqual(defaults);
+      expect(normalizeStats(undefined, DEFAULT_STATS)).toEqual(defaults);
+      expect(DEFAULT_STATS.gamesPlayed).not.toBe(142);
+      expect(DEFAULT_STATS.gamesWon).not.toBe(96);
+      expect(DEFAULT_STATS.bestTimes.hard).toBeNull();
+      expect(DEFAULT_STATS.recentGames).toEqual([]);
+    });
 
     it('should filter out invalid recent games', () => {
       const invalid = {

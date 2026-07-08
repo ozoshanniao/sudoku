@@ -4,39 +4,35 @@ import { safeStorage } from '../utils/storage';
 import { normalizeProfile, normalizeStats } from '../utils/persistedState';
 import { updateProfileAfterCompletion, updateStatsAfterCompletion, GameCompletionContext } from '../utils/playerProgress';
 
-const DEFAULT_PROFILE: Profile = {
-  username: 'Sage Solver',
-  xp: 450,
-  level: 2,
-  streak: 4,
-  lastPlayedDate: '2026-06-21',
-  completedDays: ['2026-06-18', '2026-06-19', '2026-06-20', '2026-06-21'],
+export const DEFAULT_PROFILE: Profile = {
+  username: 'Player',
+  xp: 0,
+  level: 1,
+  streak: 0,
+  lastPlayedDate: null,
+  completedDays: [],
   avatar: '🧩',
 };
 
-const DEFAULT_STATS: Stats = {
-  gamesPlayed: 142,
-  gamesWon: 96,
+export const DEFAULT_STATS: Stats = {
+  gamesPlayed: 0,
+  gamesWon: 0,
   bestTimes: {
-    easy: 194,
-    medium: 345,
-    hard: 512,
+    easy: null,
+    medium: null,
+    hard: null,
     expert: null,
   },
   weeklyActivity: {
-    Monday: 2,
-    Tuesday: 4,
-    Wednesday: 1,
-    Thursday: 5,
-    Friday: 3,
-    Saturday: 6,
-    Sunday: 4,
+    Monday: 0,
+    Tuesday: 0,
+    Wednesday: 0,
+    Thursday: 0,
+    Friday: 0,
+    Saturday: 0,
+    Sunday: 0,
   },
-  recentGames: [
-    { id: '1', difficulty: 'hard', time: 512, date: '2026-06-21T18:30:00Z', won: true, xpEarned: 300, mistakes: 2 },
-    { id: '2', difficulty: 'medium', time: 345, date: '2026-06-20T14:15:00Z', won: true, xpEarned: 200, mistakes: 1 },
-    { id: '3', difficulty: 'easy', time: 194, date: '2026-06-19T09:44:00Z', won: true, xpEarned: 100, mistakes: 0 },
-  ],
+  recentGames: [],
 };
 
 export function usePlayerProgressState() {

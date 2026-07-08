@@ -20,13 +20,13 @@ export default function ProfileScreen({
   soundEffects,
 }: ProfileScreenProps) {
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(profile?.username || 'Solver');
+  const [nameInput, setNameInput] = useState(profile?.username || 'Player');
   const [, startTransition] = useTransition();
 
   const avatars = ['🧩', '🧠', '⚡', '🦉', '🔮', '🛡️', '🎯', '🪐'];
 
   const safeProfile = {
-    username: profile?.username || 'Solver',
+    username: profile?.username || 'Player',
     level: typeof profile?.level === 'number' ? profile.level : 1,
     xp: typeof profile?.xp === 'number' ? profile.xp : 0,
     avatar: profile?.avatar || '🧩',
