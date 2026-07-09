@@ -35,6 +35,7 @@ export function normalizeSettings(value: unknown, defaults: GameSettings): GameS
     showTimer: asBoolean(value.showTimer, defaults.showTimer),
     autoCheckMistakes: asBoolean(value.autoCheckMistakes, defaults.autoCheckMistakes),
     limitMistakes: asBoolean(value.limitMistakes, defaults.limitMistakes ?? true),
+    language: value.language === 'zh' || value.language === 'en' ? value.language : defaults.language,
   };
 }
 

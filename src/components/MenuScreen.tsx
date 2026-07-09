@@ -2,6 +2,7 @@ import React, { startTransition } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { playSound } from '../utils/audio';
 import { motion } from 'motion/react';
+import { GameSettings } from '../types';
 
 interface MenuScreenProps {
   onStartNewGame: () => void;
@@ -9,6 +10,7 @@ interface MenuScreenProps {
   hasSavedGame: boolean;
   streak: number;
   soundEffects: boolean;
+  language: GameSettings['language'];
 }
 
 export default function MenuScreen({
@@ -17,7 +19,9 @@ export default function MenuScreen({
   hasSavedGame,
   streak,
   soundEffects,
+  language,
 }: MenuScreenProps) {
+  const isChinese = language === 'zh';
   const safeStreak = Number.isFinite(streak) && streak > 0 ? Math.floor(streak) : 0;
   const dots = Array.from({ length: 7 }, (_, i) => i < (safeStreak % 8 === 0 && safeStreak > 0 ? 7 : safeStreak % 7));
 
@@ -70,7 +74,7 @@ export default function MenuScreen({
           className="bg-secondary text-white py-5 px-8 rounded-full w-full flex items-center justify-center gap-3 shadow-[0_8px_20px_rgba(54,84,200,0.25)] hover:shadow-[0_12px_24px_rgba(54,84,200,0.35)] active:scale-[0.98] transition-all duration-300 cursor-pointer"
         >
           <Play className="w-4 h-4 fill-current" />
-          <span className="font-label-caps text-label-caps tracking-widest">START GAME</span>
+          <span className="font-label-caps text-label-caps tracking-widest">{isChinese ? '开始游戏' : 'START GAME'}</span>
         </button>
 
         {hasSavedGame && (
@@ -80,7 +84,7 @@ export default function MenuScreen({
             className="bg-surface-container hover:bg-surface-container-high text-primary py-5 px-8 rounded-full w-full flex items-center justify-center gap-3 active:scale-[0.98] transition-all duration-300 cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
-            <span className="font-label-caps text-label-caps tracking-widest">RESUME PUZZLE</span>
+            <span className="font-label-caps text-label-caps tracking-widest">{isChinese ? '继续棋局' : 'RESUME PUZZLE'}</span>
           </button>
         )}
       </div>
@@ -88,7 +92,7 @@ export default function MenuScreen({
       {/* Quick stats/info */}
       <div className="text-center flex flex-col items-center">
         <span className="font-note-cell text-note-cell text-on-surface-variant uppercase tracking-[0.15em] select-none">
-          Current Streak: {safeStreak} {safeStreak === 1 ? 'Day' : 'Days'}
+          {isChinese ? `当前连胜：${safeStreak} 天` : `Current Streak: ${safeStreak} ${safeStreak === 1 ? 'Day' : 'Days'}`}
         </span>
         <div className="flex gap-2 mt-4" id="streak-dots">
           {dots.map((filled, idx) => (

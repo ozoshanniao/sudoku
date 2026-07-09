@@ -2,6 +2,8 @@ export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
 export type Screen = 'menu' | 'difficulty-settings' | 'settings' | 'game' | 'daily' | 'stats' | 'profile';
 
+export type Language = 'en' | 'zh';
+
 export interface Cell {
   row: number;
   col: number;
@@ -50,4 +52,5 @@ export interface GameSettings {
   showTimer: boolean;
   autoCheckMistakes: boolean;
   limitMistakes?: boolean;
+  language: Language;
 }

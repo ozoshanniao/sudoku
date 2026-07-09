@@ -1,6 +1,7 @@
 # 极简数独 (Sudoku Minimalist)
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Play%20Now-success?style=for-the-badge&logo=github)](https://ozoshanniao.github.io/sudoku/)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-Play%20Now-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://sudoku-cku.pages.dev/)
 
 这是一款极简主义风格的数独手机端 Web App 仿真游戏。拥有优美的 UI 设计、流畅的动画体验以及完整的进度统计系统，为你带来纯粹且专注的数独解谜乐趣。
 

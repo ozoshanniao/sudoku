@@ -10,6 +10,7 @@ describe('Persisted State Normalization', () => {
       showTimer: true,
       autoCheckMistakes: true,
       limitMistakes: true,
+      language: 'en',
     };
 
     it('should return defaults for null or non-object', () => {
@@ -18,7 +19,7 @@ describe('Persisted State Normalization', () => {
     });
 
     it('should keep valid settings', () => {
-      const valid = { soundEffects: false, showTimer: false, autoCheckMistakes: false, limitMistakes: false };
+      const valid: GameSettings = { soundEffects: false, showTimer: false, autoCheckMistakes: false, limitMistakes: false, language: 'zh' };
       expect(normalizeSettings(valid, defaults)).toEqual(valid);
     });
 
@@ -27,6 +28,12 @@ describe('Persisted State Normalization', () => {
       const normalized = normalizeSettings(invalid, defaults);
       expect(normalized.soundEffects).toBe(true);
       expect(normalized.showTimer).toBe(true);
+      expect(normalized.language).toBe('en');
+    });
+
+    it('should preserve supported language settings', () => {
+      expect(normalizeSettings({ ...defaults, language: 'zh' }, defaults).language).toBe('zh');
+      expect(normalizeSettings({ ...defaults, language: 'en' }, defaults).language).toBe('en');
     });
   });
 

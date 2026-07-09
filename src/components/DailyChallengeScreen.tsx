@@ -1,5 +1,6 @@
 import React, { useState, useTransition, useMemo } from 'react';
 import { Calendar as CalendarIcon, Star, CheckCircle, Lock, Play } from 'lucide-react';
+import { GameSettings } from '../types';
 import { playSound } from '../utils/audio';
 import { motion } from 'motion/react';
 
@@ -7,21 +8,22 @@ interface DailyChallengeScreenProps {
   completedDays: string[]; // dates like '2026-06-22'
   onPlayDailyChallenge: (dateStr: string) => void;
   soundEffects: boolean;
+  language: GameSettings['language'];
 }
 
 export default function DailyChallengeScreen({
   completedDays,
   onPlayDailyChallenge,
   soundEffects,
+  language,
 }: DailyChallengeScreenProps) {
+  const isChinese = language === 'zh';
   const safeCompletedDays = Array.isArray(completedDays) ? completedDays : [];
   const today = new Date();
 
-  // Calendar browsing states (defaults to current year/month)
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonthIdx, setViewMonthIdx] = useState(today.getMonth());
 
-  // Selected date state (defaults to today's date string)
   const formatDateStr = (y: number, m: number, d: number) => {
     return `${y}-${(m + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
   };
@@ -32,17 +34,15 @@ export default function DailyChallengeScreen({
   
   const [, startTransition] = useTransition();
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  const monthNames = isChinese
+    ? ['1\u6708', '2\u6708', '3\u6708', '4\u6708', '5\u6708', '6\u6708', '7\u6708', '8\u6708', '9\u6708', '10\u6708', '11\u6708', '12\u6708']
+    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const weekdayLabels = isChinese ? ['\u65e5', '\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Helper to generate days of the view month
   const daysInMonth = new Date(viewYear, viewMonthIdx + 1, 0).getDate();
   const startDayOfWeek = new Date(viewYear, viewMonthIdx, 1).getDay();
 
   const calendarDays: (number | null)[] = [];
-  // Empty slots for padding
   for (let i = 0; i < startDayOfWeek; i++) {
     calendarDays.push(null);
   }
@@ -50,7 +50,6 @@ export default function DailyChallengeScreen({
     calendarDays.push(d);
   }
 
-  // Switch month handlers
   const handlePrevMonth = () => {
     if (soundEffects) playSound('click');
     setViewMonthIdx((prev) => {
@@ -96,11 +95,14 @@ export default function DailyChallengeScreen({
 
   const isChallengeCompleted = safeCompletedDays.includes(selectedDateStr);
 
-  // Compute solved challenges count for the viewed month
   const completedDaysCountThisMonth = useMemo(() => {
     const prefix = `${viewYear}-${(viewMonthIdx + 1).toString().padStart(2, '0')}`;
     return safeCompletedDays.filter((d) => d.startsWith(prefix)).length;
   }, [safeCompletedDays, viewYear, viewMonthIdx]);
+
+  const selectedMonthName = monthNames[parseInt(selectedDateStr.split('-')[1]) - 1];
+  const selectedDay = parseInt(selectedDateStr.split('-')[2]);
+  const selectedYear = selectedDateStr.split('-')[0];
 
   return (
     <motion.div
@@ -109,27 +111,25 @@ export default function DailyChallengeScreen({
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="flex-grow px-4 py-8 max-w-md mx-auto w-full flex flex-col gap-6 pb-6"
     >
-      {/* Daily Challenge Title Header */}
       <div className="text-center pb-4 border-b border-[#eeeeee]">
         <h2 className="text-xl font-bold text-primary flex items-center justify-center gap-2 uppercase tracking-wider">
           <CalendarIcon className="w-5 h-5 text-secondary" />
-          Daily Challenge
+          {isChinese ? '\u6bcf\u65e5\u6311\u6218' : 'Daily Challenge'}
         </h2>
         <p className="text-xs text-on-surface-variant mt-1.5 uppercase tracking-wide font-extrabold">
-          Solve calendar puzzles
+          {isChinese ? '\u5b8c\u6210\u65e5\u5386\u68cb\u5c40' : 'Solve calendar puzzles'}
         </p>
       </div>
 
-      {/* Month Calendar View Grid */}
       <div className="bg-white p-6 rounded-xl shadow-xs border border-[#eeeeee]">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrevMonth}
               className="p-1 rounded-lg border border-gray-200 text-[#444748] hover:bg-[#f5f5f5] active:scale-95 transition-all cursor-pointer flex items-center justify-center w-8 h-8"
-              aria-label="Previous Month"
+              aria-label={isChinese ? '\u4e0a\u4e2a\u6708' : 'Previous Month'}
             >
-              <span className="font-bold text-sm select-none">‹</span>
+              <span className="font-bold text-sm select-none">&lt;</span>
             </button>
             <span className="text-sm font-extrabold text-primary min-w-[110px] text-center select-none">
               {monthNames[viewMonthIdx]} {viewYear}
@@ -137,22 +137,20 @@ export default function DailyChallengeScreen({
             <button
               onClick={handleNextMonth}
               className="p-1 rounded-lg border border-gray-200 text-[#444748] hover:bg-[#f5f5f5] active:scale-95 transition-all cursor-pointer flex items-center justify-center w-8 h-8"
-              aria-label="Next Month"
+              aria-label={isChinese ? '\u4e0b\u4e2a\u6708' : 'Next Month'}
             >
-              <span className="font-bold text-sm select-none">›</span>
+              <span className="font-bold text-sm select-none">&gt;</span>
             </button>
           </div>
           <span className="text-xs text-secondary font-black uppercase tracking-wider bg-secondary/11 px-2.5 py-1 rounded-full">
-            {completedDaysCountThisMonth} solved
+            {isChinese ? `${completedDaysCountThisMonth} \u5df2\u5b8c\u6210` : `${completedDaysCountThisMonth} solved`}
           </span>
         </div>
 
-        {/* Days of week */}
         <div className="grid grid-cols-7 text-center text-xs font-semibold text-[#444748] mb-3 uppercase">
-          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          {weekdayLabels.map((day) => <span key={day}>{day}</span>)}
         </div>
 
-        {/* Calendar days mapping */}
         <div className="grid grid-cols-7 gap-1.5 text-center">
           {calendarDays.map((day, idx) => {
             if (day === null) {
@@ -196,33 +194,32 @@ export default function DailyChallengeScreen({
         </div>
       </div>
 
-      {/* Selected Date Puzzle Detail Frame */}
       {selectedDateStr && (
         <div className="bg-white p-6 rounded-xl border border-[#eeeeee] shadow-xs flex flex-col gap-4">
           <div className="flex justify-between items-start border-b border-[#eeeeee] pb-4">
             <div>
-              <span className="text-xs font-semibold text-[#444748] block uppercase tracking-wider leading-none mb-1">CHALLENGE FOR</span>
+              <span className="text-xs font-semibold text-[#444748] block uppercase tracking-wider leading-none mb-1">
+                {isChinese ? '\u6311\u6218\u65e5\u671f' : 'CHALLENGE FOR'}
+              </span>
               <span className="text-base font-extrabold text-primary font-mono leading-tight">
-                {monthNames[parseInt(selectedDateStr.split('-')[1]) - 1]} {parseInt(selectedDateStr.split('-')[2])}, {selectedDateStr.split('-')[0]}
+                {selectedMonthName} {selectedDay}, {selectedYear}
               </span>
             </div>
             {isChallengeCompleted ? (
               <span className="flex items-center gap-1 text-xs text-green-600 font-extrabold bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
-                <CheckCircle className="w-3 h-3" /> Checked
+                <CheckCircle className="w-3 h-3" /> {isChinese ? '\u5df2\u5b8c\u6210' : 'Checked'}
               </span>
             ) : (
               <span className="text-xs text-[#868381] bg-neutral-100 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider border border-neutral-200">
-                Unsolved
+                {isChinese ? '\u672a\u5b8c\u6210' : 'Unsolved'}
               </span>
             )}
           </div>
 
           <p className="text-sm text-[#444748] leading-relaxed">
-            A specialized symmetric puzzle generated deterministically for {monthNames[parseInt(selectedDateStr.split('-')[1]) - 1]} {parseInt(selectedDateStr.split('-')[2])}. 
-            {isChallengeCompleted 
-              ? " You've already solved this puzzle! You can replay it to boost statistics." 
-              : " Win this board to increase streak and win exclusive seasonal badges!"
-            }
+            {isChinese
+              ? `\u4e3a ${selectedMonthName} ${selectedDay} \u751f\u6210\u7684\u5bf9\u79f0\u6570\u72ec\u68cb\u5c40\u3002${isChallengeCompleted ? ' \u4f60\u5df2\u7ecf\u5b8c\u6210\u8fc7\u8fd9\u4e2a\u68cb\u5c40\uff0c\u53ef\u4ee5\u91cd\u73a9\u6765\u5237\u65b0\u7edf\u8ba1\u3002' : ' \u5b8c\u6210\u672c\u5c40\u53ef\u589e\u52a0\u8fde\u80dc\u5e76\u89e3\u9501\u5b63\u8282\u5fbd\u7ae0\u3002'}`
+              : `A specialized symmetric puzzle generated deterministically for ${selectedMonthName} ${selectedDay}. ${isChallengeCompleted ? "You've already solved this puzzle! You can replay it to boost statistics." : 'Win this board to increase streak and win exclusive seasonal badges!'}`}
           </p>
 
           <button
@@ -230,7 +227,7 @@ export default function DailyChallengeScreen({
             className="w-full bg-secondary text-white font-extrabold py-3.5 rounded-full flex items-center justify-center gap-2 hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer text-sm tracking-widest uppercase shadow-xs"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            <span>{isChallengeCompleted ? "REPLAY CHALLENGE" : "PLAY CHALLENGE"}</span>
+            <span>{isChallengeCompleted ? (isChinese ? '\u91cd\u73a9\u6311\u6218' : 'REPLAY CHALLENGE') : (isChinese ? '\u5f00\u59cb\u6311\u6218' : 'PLAY CHALLENGE')}</span>
           </button>
         </div>
       )}

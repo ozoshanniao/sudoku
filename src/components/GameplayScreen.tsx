@@ -36,6 +36,10 @@ export default function GameplayScreen({
   const [isGameOver, setIsGameOver] = useState(false);
   const [isWon, setIsWon] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isChinese = settings.language === 'zh';
+  const difficultyLabel = isChinese
+    ? ({ easy: '简单', medium: '中等', hard: '困难', expert: '专家' } as Record<Difficulty, string>)[difficulty]
+    : difficulty;
 
   // Undo stack: stores serialized forms of the board
   const [history, setHistory] = useState<string[]>([]);
@@ -341,7 +345,7 @@ export default function GameplayScreen({
         )}
         <button
           onClick={handleSaveAndQuitGroup}
-          aria-label="Menu"
+          aria-label={isChinese ? '菜单' : 'Menu'}
           className="text-primary hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center"
         >
           <Home className="w-5 h-5" />
@@ -349,7 +353,7 @@ export default function GameplayScreen({
         <span className="font-headline-md text-headline-md font-bold tracking-tighter text-primary">Sudoku</span>
         <button
           onClick={() => setIsPaused(true)}
-          aria-label="Settings"
+          aria-label={isChinese ? '设置' : 'Settings'}
           className="text-primary hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center"
         >
           <Settings className="w-5 h-5" />
@@ -359,11 +363,11 @@ export default function GameplayScreen({
       {/* Top Header Information Panel */}
       <div className="grid grid-cols-3 w-full px-2 mb-4">
         <div className="flex flex-col text-left">
-          <span className="font-label-caps text-label-caps text-on-surface-variant">DIFFICULTY</span>
-          <span className="font-body-md text-body-md font-medium text-primary capitalize">{difficulty}</span>
+          <span className="font-label-caps text-label-caps text-on-surface-variant">{isChinese ? '难度' : 'DIFFICULTY'}</span>
+          <span className="font-body-md text-body-md font-medium text-primary capitalize">{difficultyLabel}</span>
         </div>
         <div className="flex flex-col items-center text-center">
-          <span className="font-label-caps text-label-caps text-on-surface-variant">MISTAKES</span>
+          <span className="font-label-caps text-label-caps text-on-surface-variant">{isChinese ? '错误' : 'MISTAKES'}</span>
           <motion.span
             key={mistakes}
             animate={mistakes > 0 ? { scale: [1, 1.35, 1], color: ['#121212', '#ff0000', '#ba1a1a'] } : {}}
@@ -374,7 +378,7 @@ export default function GameplayScreen({
           </motion.span>
         </div>
         <div className="flex flex-col items-end text-right">
-          <span className="font-label-caps text-label-caps text-on-surface-variant">TIME</span>
+          <span className="font-label-caps text-label-caps text-on-surface-variant">{isChinese ? '时间' : 'TIME'}</span>
           <span className="font-body-md text-body-md font-medium text-primary">
             {settings.showTimer ? formatTime(time) : '--:--'}
           </span>
@@ -457,25 +461,25 @@ export default function GameplayScreen({
         {/* Paused Overlay */}
         {isPaused && (
           <div className="absolute inset-0 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center z-20 space-y-6">
-            <span className="text-xl font-bold text-primary select-none">Puzzles Paused</span>
+            <span className="text-xl font-bold text-primary select-none">{isChinese ? '已暂停' : 'Puzzles Paused'}</span>
             <div className="flex flex-wrap justify-center gap-3 px-4">
               <button
                 onClick={() => setIsPaused(false)}
                 className="bg-secondary text-white px-5 py-3 rounded-xl font-semibold text-xs tracking-wider cursor-pointer hover:opacity-90 active:scale-[0.98] transition-all"
               >
-                RESUME
+                {isChinese ? '继续' : 'RESUME'}
               </button>
               <button
                 onClick={handleRestartGame}
                 className="border border-secondary text-secondary px-5 py-3 rounded-xl font-semibold text-xs tracking-wider cursor-pointer hover:bg-secondary/5 active:scale-[0.98] transition-all"
               >
-                RESTART
+                {isChinese ? '重开' : 'RESTART'}
               </button>
               <button
                 onClick={handleSaveAndQuitGroup}
                 className="bg-[#eeeeee] text-primary px-5 py-3 rounded-xl font-semibold text-xs tracking-wider cursor-pointer hover:bg-gray-200 active:scale-[0.98] transition-all"
               >
-                SAVE & QUIT
+                {isChinese ? '保存并退出' : 'SAVE & QUIT'}
               </button>
             </div>
           </div>
@@ -496,7 +500,7 @@ export default function GameplayScreen({
           id="tool-undo"
         >
           <Undo2 className="w-5 h-5 mb-1" />
-          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">UNDO</span>
+          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">{isChinese ? '撤销' : 'UNDO'}</span>
         </button>
 
         {/* Erase */}
@@ -511,7 +515,7 @@ export default function GameplayScreen({
           id="tool-erase"
         >
           <Eraser className="w-5 h-5 mb-1" />
-          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">ERASE</span>
+          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">{isChinese ? '擦除' : 'ERASE'}</span>
         </button>
 
         {/* Notes Toggle */}
@@ -525,7 +529,7 @@ export default function GameplayScreen({
           id="tool-notes"
         >
           <Pencil className="w-5 h-5 mb-1" />
-          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">NOTES</span>
+          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">{isChinese ? '笔记' : 'NOTES'}</span>
         </button>
 
         {/* Hint */}
@@ -540,7 +544,7 @@ export default function GameplayScreen({
           id="tool-hint"
         >
           <Lightbulb className="w-5 h-5 mb-1" />
-          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">HINT</span>
+          <span className="font-label-caps text-label-caps tracking-wider text-[10px]">{isChinese ? '提示' : 'HINT'}</span>
         </button>
       </div>
 
@@ -592,22 +596,22 @@ export default function GameplayScreen({
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl border-2 border-primary animate-scale-up">
             <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-red-600 mb-2 select-none">Game Over</h2>
+            <h2 className="text-2xl font-bold text-red-600 mb-2 select-none">{isChinese ? '游戏结束' : 'Game Over'}</h2>
             <p className="text-sm text-on-surface-variant mb-6 select-none">
-              You've made 3 mistakes. Would you like to retry this puzzle or go back to menu?
+              {isChinese ? '你已经错了 3 次。要重试本局还是返回菜单？' : "You've made 3 mistakes. Would you like to retry this puzzle or go back to menu?"}
             </p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleRestartGame}
                 className="bg-secondary text-white py-3.5 px-4 rounded-xl font-bold text-sm tracking-widest hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer"
               >
-                RETRY PUZZLE
+                {isChinese ? '重试本局' : 'RETRY PUZZLE'}
               </button>
               <button
                 onClick={handleRestartGroup}
                 className="bg-[#eeeeee] text-primary py-3.5 px-4 rounded-xl font-bold text-sm tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-all cursor-pointer"
               >
-                BACK TO MENU
+                {isChinese ? '返回菜单' : 'BACK TO MENU'}
               </button>
             </div>
           </div>
@@ -639,12 +643,12 @@ export default function GameplayScreen({
 
             <AwardBadge />
             
-            <h2 className="text-2xl font-black text-secondary mb-2 select-none">Sudoku Solved!</h2>
+            <h2 className="text-2xl font-black text-secondary mb-2 select-none">{isChinese ? '数独已完成！' : 'Sudoku Solved!'}</h2>
             <p className="text-sm text-[#444748] mb-1 select-none">
-              Incredible solve time: <strong className="font-mono text-black font-semibold">{formatTime(time)}</strong>
+              {isChinese ? '完成用时：' : 'Incredible solve time:'} <strong className="font-mono text-black font-semibold">{formatTime(time)}</strong>
             </p>
             <p className="text-xs text-[#868381] mb-6 select-none uppercase tracking-wider font-semibold">
-              Difficulty: {difficulty} • +{difficulty === 'easy' ? 100 : difficulty === 'medium' ? 200 : difficulty === 'hard' ? 300 : 400} XP
+              {isChinese ? '难度' : 'Difficulty'}: {difficultyLabel} • +{difficulty === 'easy' ? 100 : difficulty === 'medium' ? 200 : difficulty === 'hard' ? 300 : 400} XP
             </p>
 
             <button
@@ -654,7 +658,7 @@ export default function GameplayScreen({
                 isSubmitting ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-secondary text-white hover:opacity-95 cursor-pointer'
               } ${onPlayAgain ? 'mb-3' : ''}`}
             >
-              CONTINUE TO STATS
+              {isChinese ? '查看统计' : 'CONTINUE TO STATS'}
             </button>
 
             {onPlayAgain && (
@@ -665,7 +669,7 @@ export default function GameplayScreen({
                   isSubmitting ? 'border-neutral-300 text-neutral-400 bg-neutral-100 cursor-not-allowed' : 'bg-white text-secondary border-secondary hover:bg-neutral-50 cursor-pointer'
                 }`}
               >
-                PLAY AGAIN
+                {isChinese ? '再玩一局' : 'PLAY AGAIN'}
               </button>
             )}
           </motion.div>

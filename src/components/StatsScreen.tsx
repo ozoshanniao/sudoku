@@ -1,18 +1,21 @@
 import React, { useMemo, useState } from 'react';
 import { Award, TrendingUp, Clock, History, MoreHorizontal, ArrowRight, RefreshCw, BarChart3, Trash2 } from 'lucide-react';
-import { Stats, Difficulty } from '../types';
+import { Stats, Difficulty, GameSettings } from '../types';
 import { playSound } from '../utils/audio';
 import { motion } from 'motion/react';
 
 interface StatsScreenProps {
   stats: Stats;
   soundEffects: boolean;
+  language: GameSettings['language'];
 }
 
 export default function StatsScreen({
   stats,
   soundEffects,
+  language,
 }: StatsScreenProps) {
+  const isChinese = language === 'zh';
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('hard');
 
   const displayedGamesPlayed = stats.gamesPlayed;
@@ -53,7 +56,7 @@ export default function StatsScreen({
   }, [stats.recentGames, selectedDifficulty]);
 
   // Map stats.weeklyActivity to M, T, W, T, F, S, S columns
-  const weeklyDaysLabel = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const weeklyDaysLabel = isChinese ? ['\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d', '\u65e5'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const dayKeyMap = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   
   const weeklyGames = useMemo(() => {
@@ -74,13 +77,13 @@ export default function StatsScreen({
   }, []);
 
   const formatDateSafe = (dateString?: string) => {
-    if (!dateString) return 'Recent';
+    if (!dateString) return isChinese ? '\u6700\u8fd1' : 'Recent';
     try {
       const d = new Date(dateString);
-      if (isNaN(d.getTime())) return 'Recent';
-      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      if (isNaN(d.getTime())) return isChinese ? '\u6700\u8fd1' : 'Recent';
+      return d.toLocaleDateString(isChinese ? 'zh-CN' : undefined, { month: 'short', day: 'numeric' });
     } catch {
-      return 'Recent';
+      return isChinese ? '\u6700\u8fd1' : 'Recent';
     }
   };
 
@@ -95,10 +98,10 @@ export default function StatsScreen({
       <div className="mb-8 flex justify-between items-end pb-4 border-b border-[#eeeeee]">
         <div>
           <h2 className="font-display-cell text-display-cell text-primary font-bold mb-2 select-none">
-            Performance Overview
+            {isChinese ? '\u8868\u73b0\u6982\u89c8' : 'Performance Overview'}
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant select-none">
-            All-time statistics across all difficulties.
+            {isChinese ? '\u6240\u6709\u96be\u5ea6\u7684\u5386\u53f2\u7edf\u8ba1\u3002' : 'All-time statistics across all difficulties.'}
           </p>
         </div>
 
@@ -109,7 +112,7 @@ export default function StatsScreen({
         {/* Metric Card 1: Games Played */}
         <div className="w-full bg-[#f3f3f3] rounded-2xl p-8 flex flex-col justify-between border border-transparent shadow-sm aspect-square lg:aspect-auto">
           <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">
-            Games Played
+            {isChinese ? '\u5df2\u73a9\u5c40\u6570' : 'Games Played'}
           </span>
           <div className="mt-8">
             <span className="font-display-cell text-display-cell text-primary font-medium block leading-none">
@@ -117,7 +120,7 @@ export default function StatsScreen({
             </span>
             <div className="flex items-center gap-2 mt-4 text-secondary text-xs select-none">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span className="font-bold">+{gamesThisWeek} this week</span>
+              <span className="font-bold">{isChinese ? `\u672c\u5468 +${gamesThisWeek}` : `+${gamesThisWeek} this week`}</span>
             </div>
           </div>
         </div>
@@ -125,7 +128,7 @@ export default function StatsScreen({
         {/* Metric Card 2: Win Rate */}
         <div className="w-full bg-[#f3f3f3] rounded-2xl p-8 flex flex-col justify-between border border-transparent shadow-sm aspect-square lg:aspect-auto">
           <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">
-            Win Rate
+            {isChinese ? '\u80dc\u7387' : 'Win Rate'}
           </span>
           <div className="mt-8">
             <span className="font-display-cell text-display-cell text-secondary font-medium block leading-none">
@@ -145,7 +148,7 @@ export default function StatsScreen({
         <div className="w-full bg-[#f3f3f3] rounded-2xl p-6 flex flex-col justify-between border border-transparent shadow-sm aspect-square lg:aspect-auto">
           <div className="flex flex-col gap-3">
             <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">
-              Best Time
+              {isChinese ? '\u6700\u4f73\u7528\u65f6' : 'Best Time'}
             </span>
             {/* Segmented Control */}
             <div className="flex bg-[#e8e8e8] p-[3px] rounded-lg w-full text-[10px] font-bold select-none relative z-10">
@@ -162,7 +165,7 @@ export default function StatsScreen({
                       : 'text-on-surface-variant hover:text-primary'
                   }`}
                 >
-                  {diff}
+                  {isChinese ? ({ easy: '\u7b80\u5355', medium: '\u4e2d\u7b49', hard: '\u56f0\u96be', expert: '\u4e13\u5bb6' } as Record<Difficulty, string>)[diff] : diff}
                 </button>
               ))}
             </div>
@@ -180,7 +183,7 @@ export default function StatsScreen({
               </span>
               <div className="flex items-center gap-2 mt-4 text-on-surface-variant text-xs select-none">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Avg: {avgTimeForSelected !== null ? formatTime(avgTimeForSelected) : '--:--'}</span>
+                <span>{isChinese ? '\u5e73\u5747' : 'Avg'}: {avgTimeForSelected !== null ? formatTime(avgTimeForSelected) : '--:--'}</span>
               </div>
             </motion.div>
           </div>
@@ -190,9 +193,9 @@ export default function StatsScreen({
       {/* Weekly Activity columns (Full Width Card) */}
       <div className="w-full bg-[#f3f3f3] rounded-2xl p-8 border border-transparent shadow-sm mb-12">
         <div className="flex justify-between items-center mb-8">
-          <span className="font-headline-md text-headline-md font-bold text-primary">Weekly Activity</span>
+          <span className="font-headline-md text-headline-md font-bold text-primary">{isChinese ? '\u6bcf\u5468\u6d3b\u8dc3' : 'Weekly Activity'}</span>
           <span className="font-note-cell text-note-cell text-on-surface-variant bg-surface-variant rounded-full px-3 py-1.5">
-            LAST 7 DAYS
+            {isChinese ? '\u8fd1 7 \u5929' : 'LAST 7 DAYS'}
           </span>
         </div>
 
@@ -223,19 +226,19 @@ export default function StatsScreen({
       {/* Recent Games List (Minimalist Table) */}
       <div className="w-full mb-8 bg-[#f3f3f3] rounded-2xl p-8 shadow-sm">
         <h3 className="font-headline-md text-headline-md font-bold text-primary mb-6">
-          Recent Games
+          {isChinese ? '\u6700\u8fd1\u5bf9\u5c40' : 'Recent Games'}
         </h3>
 
         {(!stats || !Array.isArray(stats.recentGames) || stats.recentGames.length === 0) ? (
           <p className="text-xs text-[#444748] py-4 text-center select-none font-bold">
-            No games completed yet. Play & solve a board!
+            {isChinese ? '\u8fd8\u6ca1\u6709\u5b8c\u6210\u7684\u5bf9\u5c40\u3002\u53bb\u5b8c\u6210\u4e00\u5c40\u5427\uff01' : 'No games completed yet. Play & solve a board!'}
           </p>
         ) : (
           <div className="divide-y divide-[#c4c7c7]" id="recent-games-list">
             {stats.recentGames.slice(0, 5).map((g) => (
               <div key={g.id} className="flex items-center justify-between py-4 hover:bg-surface-container transition-colors px-4 -mx-4 rounded-xl">
                 <div className="flex items-center gap-4 w-1/3">
-                  <span className="font-body-md text-body-md text-primary font-medium capitalize">{g.difficulty}</span>
+                  <span className="font-body-md text-body-md text-primary font-medium capitalize">{isChinese ? ({ easy: '\u7b80\u5355', medium: '\u4e2d\u7b49', hard: '\u56f0\u96be', expert: '\u4e13\u5bb6' } as Record<Difficulty, string>)[g.difficulty] : g.difficulty}</span>
                   {g.difficulty === 'expert' && (
                     <Award className="w-4 h-4 text-secondary" />
                   )}

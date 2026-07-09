@@ -8,6 +8,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   showTimer: true,
   autoCheckMistakes: true,
   limitMistakes: true,
+  language: 'en',
 };
 
 export function useGameSettings() {

@@ -27,6 +27,8 @@ export default function App() {
     applyGameCompletion
   } = usePlayerProgressState();
 
+  const isChinese = settings.language === 'zh';
+
   // Active game states
   const {
     gameDifficulty,
@@ -144,7 +146,7 @@ export default function App() {
       {screen !== 'game' && (
         <aside className="hidden md:flex flex-col p-6 gap-4 h-full w-80 fixed left-0 top-0 z-[60] bg-white border-r-2 border-primary">
           <div className="mb-8 mt-2">
-            <h2 className="font-headline-md text-headline-md font-bold tracking-tighter text-primary">Sudoku Pro</h2>
+            <h2 className="font-headline-md text-headline-md font-bold tracking-tighter text-primary">{isChinese ? '数独' : 'Sudoku Pro'}</h2>
           </div>
           <nav className="flex flex-col gap-2 flex-grow">
             <button
@@ -156,7 +158,7 @@ export default function App() {
               }`}
             >
               <Grid3X3 className={`w-5 h-5 ${screen === 'menu' || screen === 'difficulty-settings' ? 'text-secondary' : ''}`} />
-              <span>New Game</span>
+              <span>{isChinese ? '新游戏' : 'New Game'}</span>
             </button>
             <button
               onClick={() => handleTabClick('daily')}
@@ -167,7 +169,7 @@ export default function App() {
               }`}
             >
               <Calendar className={`w-5 h-5 ${screen === 'daily' ? 'text-secondary' : ''}`} />
-              <span>Daily Challenge</span>
+              <span>{isChinese ? '每日挑战' : 'Daily Challenge'}</span>
             </button>
             <button
               onClick={() => handleTabClick('stats')}
@@ -178,7 +180,7 @@ export default function App() {
               }`}
             >
               <BarChart3 className={`w-5 h-5 ${screen === 'stats' ? 'text-secondary' : ''}`} />
-              <span>Stats</span>
+              <span>{isChinese ? '统计' : 'Stats'}</span>
             </button>
             <button
               onClick={() => handleTabClick('profile')}
@@ -189,14 +191,14 @@ export default function App() {
               }`}
             >
               <User className={`w-5 h-5 ${screen === 'profile' ? 'text-secondary' : ''}`} />
-              <span>Profile</span>
+              <span>{isChinese ? '档案' : 'Profile'}</span>
             </button>
             <button
               onClick={() => handleTabClick('settings')}
               className={'mt-auto flex items-center gap-4 px-4 py-3 rounded transition-all duration-200 text-left cursor-pointer font-body-md text-body-md ' + (screen === 'settings' ? 'bg-surface-container-low text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-variant hover:text-primary')}
             >
               <Settings className={'w-5 h-5 ' + (screen === 'settings' ? 'text-secondary' : '')} />
-              <span>Settings</span>
+              <span>{isChinese ? '设置' : 'Settings'}</span>
             </button>
           </nav>
         </aside>
@@ -208,17 +210,17 @@ export default function App() {
           <div className="flex items-center justify-between px-6 py-4 w-full">
             <button
               onClick={() => handleTabClick('menu')}
-              aria-label="Menu"
+              aria-label={isChinese ? '菜单' : 'Menu'}
               className="text-primary hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center"
             >
               <Menu className="w-5 h-5" />
             </button>
             <h1 className="font-headline-md text-headline-md font-bold tracking-tighter text-primary select-none">
-              Sudoku
+              {isChinese ? '数独' : 'Sudoku'}
             </h1>
             <button
               onClick={() => handleTabClick('settings')}
-              aria-label="Settings"
+              aria-label={isChinese ? '设置' : 'Settings'}
               className={'hover:bg-neutral-100 transition-colors p-2 rounded-full cursor-pointer flex items-center ' + (screen === 'settings' ? 'bg-secondary/10 text-secondary' : 'text-primary')}
             >
               <Settings className="w-5 h-5" />
@@ -236,6 +238,7 @@ export default function App() {
             hasSavedGame={hasSavedGame}
             streak={profile.streak}
             soundEffects={settings.soundEffects}
+            language={settings.language}
           />
         )}
 
@@ -275,6 +278,7 @@ export default function App() {
             completedDays={profile.completedDays}
             onPlayDailyChallenge={handlePlayDailyChallenge}
             soundEffects={settings.soundEffects}
+            language={settings.language}
           />
         )}
 
@@ -282,6 +286,7 @@ export default function App() {
           <StatsScreen
             stats={stats}
             soundEffects={settings.soundEffects}
+            language={settings.language}
           />
         )}
 
@@ -292,6 +297,7 @@ export default function App() {
             onUpdateName={handleUpdateName}
             onUpdateAvatar={handleUpdateAvatar}
             soundEffects={settings.soundEffects}
+            language={settings.language}
           />
         )}
       </main>
@@ -309,7 +315,7 @@ export default function App() {
             }`}
           >
             <Grid3X3 className="w-5 h-5 mb-1" />
-            <span className="font-label-caps text-[10px] tracking-wider">PLAY</span>
+            <span className="font-label-caps text-[10px] tracking-wider">{isChinese ? '游戏' : 'PLAY'}</span>
           </button>
 
           {/* DAILY */}
@@ -320,7 +326,7 @@ export default function App() {
             }`}
           >
             <Calendar className="w-5 h-5 mb-1" />
-            <span className="font-label-caps text-[10px] tracking-wider">DAILY</span>
+            <span className="font-label-caps text-[10px] tracking-wider">{isChinese ? '每日' : 'DAILY'}</span>
           </button>
 
           {/* STATS */}
@@ -331,7 +337,7 @@ export default function App() {
             }`}
           >
             <BarChart3 className="w-5 h-5 mb-1" />
-            <span className="font-label-caps text-[10px] tracking-wider">STATS</span>
+            <span className="font-label-caps text-[10px] tracking-wider">{isChinese ? '统计' : 'STATS'}</span>
           </button>
 
           {/* PROFILE */}
@@ -342,7 +348,7 @@ export default function App() {
             }`}
           >
             <User className="w-5 h-5 mb-1" />
-            <span className="font-label-caps text-[10px] tracking-wider">PROFILE</span>
+            <span className="font-label-caps text-[10px] tracking-wider">{isChinese ? '档案' : 'PROFILE'}</span>
           </button>
         </nav>
       )}
@@ -404,10 +410,10 @@ export default function App() {
             {/* 文字与提示 */}
             <div className="flex flex-col items-center gap-2 text-center">
               <h3 className="text-lg font-bold text-[#121212] tracking-tight">
-                Generating Puzzle
+                {isChinese ? '正在生成棋盘' : 'Generating Puzzle'}
               </h3>
               <p className="text-sm text-neutral-500 font-medium max-w-[240px] leading-relaxed animate-pulse">
-                Analyzing logic paths for unique solution...
+                {isChinese ? '正在分析唯一解路径...' : 'Analyzing logic paths for unique solution...'}
               </p>
             </div>
           </div>

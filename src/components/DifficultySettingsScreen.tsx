@@ -17,25 +17,26 @@ export default function DifficultySettingsScreen({
   settings,
   onConfirmStartGame,
 }: DifficultySettingsScreenProps) {
+  const isChinese = settings.language === 'zh';
   const difficulties: { val: Difficulty; label: string; icon: React.ReactNode }[] = [
     {
       val: 'easy',
-      label: 'Easy',
+      label: isChinese ? '简单' : 'Easy',
       icon: <Smile className="w-5 h-5 group-hover:text-primary mb-1 transition-colors duration-200" />,
     },
     {
       val: 'medium',
-      label: 'Medium',
+      label: isChinese ? '中等' : 'Medium',
       icon: <BarChart2 className="w-5 h-5 text-secondary mb-1" />,
     },
     {
       val: 'hard',
-      label: 'Hard',
+      label: isChinese ? '困难' : 'Hard',
       icon: <AlertTriangle className="w-5 h-5 group-hover:text-primary mb-1 transition-colors duration-200" />,
     },
     {
       val: 'expert',
-      label: 'Expert',
+      label: isChinese ? '专家' : 'Expert',
       icon: <Flame className="w-5 h-5 group-hover:text-primary mb-1 transition-colors duration-200" />,
     },
   ];
@@ -62,7 +63,7 @@ export default function DifficultySettingsScreen({
     >
       {/* Title */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-headline-md text-headline-md text-primary select-none pb-2">Select Difficulty</h2>
+        <h2 className="font-headline-md text-headline-md text-primary select-none pb-2">{isChinese ? '选择难度' : 'Select Difficulty'}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {difficulties.map(({ val, label, icon }) => {
             const isActive = difficulty === val;
@@ -95,7 +96,7 @@ export default function DifficultySettingsScreen({
           id="confirm-start-button"
           className="w-full bg-secondary text-white font-headline-md text-headline-md py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer"
         >
-          <span>Start Game</span>
+          <span>{isChinese ? '开始游戏' : 'Start Game'}</span>
           <Play className="w-5 h-5 fill-current" />
         </button>
       </div>

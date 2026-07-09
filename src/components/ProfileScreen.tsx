@@ -1,6 +1,6 @@
 import React, { useState, useTransition } from 'react';
 import { User, Award, Shield, Edit2, Check, Sparkles, Flame, Star } from 'lucide-react';
-import { Profile, Stats } from '../types';
+import { Profile, Stats, GameSettings } from '../types';
 import { playSound } from '../utils/audio';
 import { motion } from 'motion/react';
 
@@ -10,6 +10,7 @@ interface ProfileScreenProps {
   onUpdateName: (name: string) => void;
   onUpdateAvatar: (avatar: string) => void;
   soundEffects: boolean;
+  language: GameSettings['language'];
 }
 
 export default function ProfileScreen({
@@ -18,7 +19,9 @@ export default function ProfileScreen({
   onUpdateName,
   onUpdateAvatar,
   soundEffects,
+  language,
 }: ProfileScreenProps) {
+  const isChinese = language === 'zh';
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(profile?.username || 'Player');
   const [, startTransition] = useTransition();
@@ -40,29 +43,29 @@ export default function ProfileScreen({
   const achievements = [
     {
       id: "first_win",
-      title: "First Code Solved",
-      desc: "Successfully solved your first Sudoku puzzle",
+      title: isChinese ? '\u9996\u6b21\u89e3\u9898' : "First Code Solved",
+      desc: isChinese ? '\u6210\u529f\u89e3\u51fa\u7b2c\u4e00\u9053\u6570\u72ec\u9898' : "Successfully solved your first Sudoku puzzle",
       unlocked: safeGamesWon >= 1,
       icon: <Check className="w-5 h-5 text-green-600" />,
     },
     {
       id: "expert_beaten",
-      title: "Sudoku Arch-mage",
-      desc: "Successfully beat an Expert puzzle",
+      title: isChinese ? '\u6570\u72ec\u5927\u5e08' : "Sudoku Arch-mage",
+      desc: isChinese ? '\u6210\u529f\u5b8c\u6210\u4e13\u5bb6\u96be\u5ea6' : "Successfully beat an Expert puzzle",
       unlocked: safeRecentGames.some((g) => g && g.difficulty === 'expert' && g.won),
       icon: <Flame className="w-5 h-5 text-red-500" />,
     },
     {
       id: "no_mistakes",
-      title: "Pristine Solver",
-      desc: "Complete a puzzle without logging failures",
+      title: isChinese ? '\u96f6\u5931\u8bef\u89e3\u9898' : "Pristine Solver",
+      desc: isChinese ? '\u65e0\u9519\u8bef\u5b8c\u6210\u4e00\u5c40' : "Complete a puzzle without logging failures",
       unlocked: safeRecentGames.some((g) => g && g.won && g.mistakes === 0),
       icon: <Sparkles className="w-5 h-5 text-secondary" />,
     },
     {
       id: "streak_3",
-      title: "Mindful Streaker",
-      desc: "Maintained a 3+ day completion streak",
+      title: isChinese ? '\u8fde\u80dc\u4e60\u60ef' : "Mindful Streaker",
+      desc: isChinese ? '\u4fdd\u6301 3 \u5929\u4ee5\u4e0a\u5b8c\u6210\u8fde\u80dc' : "Maintained a 3+ day completion streak",
       unlocked: safeStreak >= 3,
       icon: <Star className="w-5 h-5 text-yellow-500 fill-current" />,
     },
@@ -111,7 +114,7 @@ export default function ProfileScreen({
               maxLength={15}
               onChange={(e) => setNameInput(e.target.value)}
               className="border border-[#c4c7c7] px-2 py-1 rounded-lg text-xs font-bold max-w-[100px] outline-none text-center bg-[#f5f5f5]"
-              placeholder="Username"
+              placeholder={isChinese ? '\u7528\u6237\u540d' : 'Username'}
             />
             <button
               onClick={handleUpdateNameSubmit}
@@ -129,13 +132,13 @@ export default function ProfileScreen({
 
         <div className="flex items-center gap-0.5 bg-[#eeeeee] px-2 py-0.5 rounded-md text-[7.5px] text-on-surface-variant font-black mt-1.5 select-none uppercase tracking-wider">
           <Shield className="w-2.5 h-2.5 text-secondary" />
-          <span>LEVEL {safeProfile.level} SOLVER</span>
+          <span>{isChinese ? `\u7b49\u7ea7 ${safeProfile.level} \u89e3\u9898\u8005` : `LEVEL ${safeProfile.level} SOLVER`}</span>
         </div>
 
         {/* Level Progress Slider */}
         <div className="w-full mt-3 text-left">
           <div className="flex justify-between text-[7.5px] text-on-surface-variant mb-0.5 font-bold select-none">
-            <span>Next Level Progress</span>
+            <span>{isChinese ? '\u4e0b\u4e00\u7b49\u7ea7\u8fdb\u5ea6' : 'Next Level Progress'}</span>
             <span>{safeProfile.xp} / {nextLevelXp} XP</span>
           </div>
           <div className="w-full h-1 bg-[#eeeeee] rounded-full overflow-hidden relative">
@@ -149,7 +152,7 @@ export default function ProfileScreen({
 
       {/* Avatar Change Row */}
       <div className="bg-white p-2.5 rounded-xl border border-[#eeeeee] shadow-sm mb-2.5">
-        <h4 className="text-[9.5px] font-black text-on-surface-variant uppercase tracking-wider mb-2.5 select-none">Customize Avatar</h4>
+        <h4 className="text-[9.5px] font-black text-on-surface-variant uppercase tracking-wider mb-2.5 select-none">{isChinese ? '\u81ea\u5b9a\u4e49\u5934\u50cf' : 'Customize Avatar'}</h4>
         <div className="flex gap-1.5 flex-wrap justify-center">
           {avatars.map((emoji) => (
             <button
@@ -171,7 +174,7 @@ export default function ProfileScreen({
       <div className="bg-white p-2.5 rounded-xl border border-[#eeeeee] shadow-sm">
         <h4 className="text-[10px] font-black text-primary flex items-center gap-1 mb-2.5 select-none uppercase tracking-wider">
           <Award className="w-3.5 h-3.5 text-secondary" />
-          Badge Wall
+          {isChinese ? '\u5fbd\u7ae0\u5899' : 'Badge Wall'}
         </h4>
 
         <div className="grid grid-cols-2 gap-2.5">
