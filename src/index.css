@@ -128,11 +128,99 @@
   }
 }
 
+html,
+body,
+#root {
+  min-height: 100dvh;
+  width: 100%;
+}
+
+html {
+  background-color: #f9f9f9;
+}
+
 body {
   background-color: #f9f9f9;
   font-family: var(--font-sans);
   overflow-x: hidden;
-  height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  margin: 0;
+  overscroll-behavior-y: none;
+}
+
+.gameplay-screen {
+  --game-shell-inline: clamp(12px, 3vw, 32px);
+  --game-shell-block: clamp(8px, 1.8dvh, 16px);
+  --game-board-size: min(
+    calc(100vw - (var(--game-shell-inline) * 2)),
+    calc(100dvh - 248px - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
+    700px
+  );
+
+  width: min(100%, 760px);
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: calc(var(--game-shell-block) + env(safe-area-inset-top)) var(--game-shell-inline)
+    calc(var(--game-shell-block) + env(safe-area-inset-bottom));
+}
+
+.gameplay-header {
+  margin-bottom: clamp(8px, 1.4dvh, 16px);
+  padding-block: clamp(8px, 1.2dvh, 12px);
+}
+
+.gameplay-status {
+  margin-bottom: clamp(8px, 1.4dvh, 16px);
+}
+
+.sudoku-board {
+  width: var(--game-board-size);
+  height: var(--game-board-size);
+  margin-inline: auto;
+}
+
+.gameplay-tools {
+  margin-top: clamp(10px, 1.8dvh, 16px);
+}
+
+.gameplay-numpad {
+  gap: clamp(8px, 1.6vw, 12px);
+  margin-top: clamp(12px, 2dvh, 24px);
+  margin-bottom: 0;
+}
+
+.numpad-key {
+  height: clamp(48px, 7dvh, 64px);
+}
+
+@media (min-width: 768px) {
+  .gameplay-screen {
+    --game-shell-inline: clamp(32px, 6vw, 64px);
+    --game-board-size: min(
+      calc(100vw - (var(--game-shell-inline) * 2)),
+      calc(100dvh - 244px - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
+      720px
+    );
+  }
+}
+
+@media (max-height: 700px) {
+  .gameplay-screen {
+    --game-board-size: min(
+      calc(100vw - (var(--game-shell-inline) * 2)),
+      calc(100dvh - 224px - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
+      640px
+    );
+  }
+
+  .gameplay-tools button {
+    padding-block: 0.5rem;
+  }
+
+  .numpad-key {
+    height: 46px;
+  }
 }
 
 /* Hide scrollbar for clean look */

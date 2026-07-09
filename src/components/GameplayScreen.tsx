@@ -335,9 +335,9 @@ export default function GameplayScreen({
   };
 
   return (
-    <div className="flex-grow flex flex-col justify-start px-2 py-4 max-w-md mx-auto w-full select-none animate-fade-in pb-2">
+    <div className="gameplay-screen flex-grow flex flex-col justify-start select-none animate-fade-in">
       {/* Design Header: menu Sudoku settings */}
-      <div className="flex justify-between items-center w-full px-4 py-3 mb-4 border-b border-[#eeeeee] relative">
+      <div className="gameplay-header flex justify-between items-center w-full px-4 py-3 mb-4 border-b border-[#eeeeee] relative">
         {(import.meta as any).env.DEV && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-neutral-400 font-mono tracking-tighter whitespace-nowrap opacity-50 pointer-events-none">
             Dev: Ctrl + Shift + Enter 自动完成
@@ -361,7 +361,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Top Header Information Panel */}
-      <div className="grid grid-cols-3 w-full px-2 mb-4">
+      <div className="gameplay-status grid grid-cols-3 w-full px-2 mb-4">
         <div className="flex flex-col text-left">
           <span className="font-label-caps text-label-caps text-on-surface-variant">{isChinese ? '难度' : 'DIFFICULTY'}</span>
           <span className="font-body-md text-body-md font-medium text-primary capitalize">{difficultyLabel}</span>
@@ -386,7 +386,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Main Board Container */}
-      <div className="relative w-full aspect-square bg-[#e2e2e2] rounded-xl overflow-hidden shadow-sm border border-gray-300">
+      <div className="sudoku-board relative bg-[#e2e2e2] rounded-xl overflow-hidden shadow-sm border border-gray-300">
         {/* Custom thicker lines layer for the 3x3 grids */}
         <div className="absolute left-1/3 top-0 bottom-0 w-[2px] bg-gray-400 pointer-events-none z-10" />
         <div className="absolute left-2/3 top-0 bottom-0 w-[2px] bg-gray-400 pointer-events-none z-10" />
@@ -487,7 +487,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Tools Row below board grid */}
-      <div className="grid grid-cols-4 gap-2 w-full px-2 mt-4">
+      <div className="gameplay-tools grid grid-cols-4 gap-2 w-full px-2 mt-4">
         {/* Undo */}
         <button
           onClick={handleUndo}
@@ -549,7 +549,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Custom Numpad Panel */}
-      <div className="grid grid-cols-5 gap-3 w-full px-2 mb-10 mt-6">
+      <div className="gameplay-numpad grid grid-cols-5 gap-3 w-full px-2 mb-10 mt-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
           const remaining = getRemainingCount(num);
           const isDisabled = remaining === 0;
@@ -559,7 +559,7 @@ export default function GameplayScreen({
               key={num}
               onClick={() => handleInputNumber(num)}
               disabled={isDisabled}
-              className={`shadow-sm rounded-xl flex flex-col items-center justify-center transition-all duration-200 select-none h-14 ${
+              className={`numpad-key shadow-sm rounded-xl flex flex-col items-center justify-center transition-all duration-200 select-none h-14 ${
                 isDisabled
                   ? 'bg-neutral-100 text-neutral-300 cursor-not-allowed shadow-none'
                   : 'bg-white text-primary hover:bg-surface-variant active:bg-outline-variant hover:shadow-md cursor-pointer'
@@ -585,7 +585,7 @@ export default function GameplayScreen({
         {/* Erase button mapping as Numpad Backspace */}
         <button
           onClick={handleErase}
-          className="bg-white hover:bg-surface-variant active:bg-outline-variant shadow-sm rounded-xl text-on-surface-variant h-14 flex items-center justify-center cursor-pointer transition-all hover:shadow-md"
+          className="numpad-key bg-white hover:bg-surface-variant active:bg-outline-variant shadow-sm rounded-xl text-on-surface-variant h-14 flex items-center justify-center cursor-pointer transition-all hover:shadow-md"
         >
           <Delete className="w-6 h-6" />
         </button>
