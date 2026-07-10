@@ -631,8 +631,6 @@ export default function GameplayScreen({
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
             className="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-2 border-secondary relative overflow-hidden"
           >
-            <ConfettiEffect />
-            
             {/* Confetti-like Sparkle sparkles on complete */}
             <div className="absolute top-2 left-4 animate-bounce">
               <Sparkles className="w-6 h-6 text-yellow-500" />
@@ -675,46 +673,79 @@ export default function GameplayScreen({
           </motion.div>
         </motion.div>
       )}
+
+      {/* This is deliberately separate from the result card: it fills the viewport
+          but cannot intercept clicks on the result actions. */}
+      {isWon && <CornerConfettiEffect />}
     </div>
   );
 }
 
-function ConfettiEffect() {
-  const colors = ['#3654c8', '#ff7b00', '#00f5d4', '#fee440', '#70e000', '#ff007f'];
-  const particles = Array.from({ length: 45 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 240 - 120, // Spread range left/right
-    y: Math.random() * -240 - 80,  // Project upwards
-    rot: Math.random() * 360,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    size: Math.random() * 6 + 6,
-  }));
+type CelebrationParticle = {
+  id: number;
+  origin: 'left' | 'right';
+  x: number;
+  peakY: number;
+  rotation: number;
+  color: string;
+  width: number;
+  height: number;
+  delay: number;
+};
+
+function CornerConfettiEffect() {
+  // The effect is mounted only when a game is won. Memoizing the particles keeps
+  // interaction-driven re-renders (for example, clicking "Play again") from
+  // creating a second burst.
+  const particles = useMemo<CelebrationParticle[]>(() => {
+    const colors = ['#3654c8', '#ff7b00', '#00b894', '#fee440', '#a855f7', '#ff4d6d'];
+
+    return Array.from({ length: 64 }, (_, id) => {
+      const origin = id % 2 === 0 ? 'left' : 'right';
+      const distance = 27 + Math.random() * 30;
+      return {
+        id,
+        origin,
+        x: origin === 'left' ? distance : -distance,
+        peakY: -(38 + Math.random() * 34),
+        rotation: (Math.random() - 0.5) * 900,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        width: 4 + Math.random() * 4,
+        height: 13 + Math.random() * 13,
+        delay: Math.random() * 0.22,
+      };
+    });
+  }, []);
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-30">
+    <div aria-hidden="true" className="fixed inset-0 z-[110] pointer-events-none overflow-hidden">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          initial={{ x: 0, y: 120, rotate: 0, opacity: 1 }}
+          initial={{ x: '0vw', y: '0vh', rotate: 0, opacity: 0 }}
           animate={{
-            x: p.x,
-            y: [120, p.y, 450], // Project upward, then fall offscreen
-            rotate: p.rot + 360,
-            opacity: [1, 1, 0],
+            // Two floor-level launchers fire toward the upper centre, then the
+            // ribbons drift down like a small fireworks finale.
+            x: ['0vw', `${p.x * 0.72}vw`, `${p.x}vw`],
+            y: ['0vh', `${p.peakY}vh`, `${p.peakY + 12}vh`],
+            rotate: [0, p.rotation * 0.65, p.rotation],
+            opacity: [0, 1, 1, 0],
           }}
           transition={{
-            duration: 2.0,
-            ease: 'easeOut',
-            delay: Math.random() * 0.15,
+            duration: 2.35,
+            times: [0, 0.38, 1],
+            ease: ['easeOut', 'easeIn'],
+            delay: p.delay,
           }}
           style={{
             position: 'absolute',
-            left: '50%',
-            top: '30%',
-            width: p.size,
-            height: p.size,
+            left: p.origin === 'left' ? '3vw' : 'calc(97vw - 8px)',
+            top: '93vh',
+            width: p.width,
+            height: p.height,
             backgroundColor: p.color,
-            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            borderRadius: '2px',
+            boxShadow: `0 0 8px ${p.color}80`,
           }}
         />
       ))}
