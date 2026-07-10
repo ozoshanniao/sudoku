@@ -166,12 +166,18 @@ body {
 }
 
 .gameplay-header {
+  width: var(--game-board-size);
+  margin-inline: auto;
   margin-bottom: clamp(8px, 1.4dvh, 16px);
+  padding-inline: clamp(8px, 1.2vw, 16px);
   padding-block: clamp(8px, 1.2dvh, 12px);
 }
 
 .gameplay-status {
+  width: var(--game-board-size);
+  margin-inline: auto;
   margin-bottom: clamp(8px, 1.4dvh, 16px);
+  padding-inline: clamp(2px, 0.6vw, 8px);
 }
 
 .sudoku-board {
@@ -181,10 +187,14 @@ body {
 }
 
 .gameplay-tools {
+  width: var(--game-board-size);
+  margin-inline: auto;
   margin-top: clamp(10px, 1.8dvh, 16px);
 }
 
 .gameplay-numpad {
+  width: var(--game-board-size);
+  margin-inline: auto;
   gap: clamp(8px, 1.6vw, 12px);
   margin-top: clamp(12px, 2dvh, 24px);
   margin-bottom: 0;

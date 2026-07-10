@@ -337,7 +337,7 @@ export default function GameplayScreen({
   return (
     <div className="gameplay-screen flex-grow flex flex-col justify-start select-none animate-fade-in">
       {/* Design Header: menu Sudoku settings */}
-      <div className="gameplay-header flex justify-between items-center w-full px-4 py-3 mb-4 border-b border-[#eeeeee] relative">
+      <div className="gameplay-header flex justify-between items-center py-3 mb-4 border-b border-[#eeeeee] relative">
         {(import.meta as any).env.DEV && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-neutral-400 font-mono tracking-tighter whitespace-nowrap opacity-50 pointer-events-none">
             Dev: Ctrl + Shift + Enter 自动完成
@@ -361,7 +361,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Top Header Information Panel */}
-      <div className="gameplay-status grid grid-cols-3 w-full px-2 mb-4">
+      <div className="gameplay-status grid grid-cols-3 mb-4">
         <div className="flex flex-col text-left">
           <span className="font-label-caps text-label-caps text-on-surface-variant">{isChinese ? '难度' : 'DIFFICULTY'}</span>
           <span className="font-body-md text-body-md font-medium text-primary capitalize">{difficultyLabel}</span>
@@ -487,7 +487,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Tools Row below board grid */}
-      <div className="gameplay-tools grid grid-cols-4 gap-2 w-full px-2 mt-4">
+      <div className="gameplay-tools grid grid-cols-4 gap-2 mt-4">
         {/* Undo */}
         <button
           onClick={handleUndo}
@@ -549,7 +549,7 @@ export default function GameplayScreen({
       </div>
 
       {/* Custom Numpad Panel */}
-      <div className="gameplay-numpad grid grid-cols-5 gap-3 w-full px-2 mb-10 mt-6">
+      <div className="gameplay-numpad grid grid-cols-5 gap-3 mb-10 mt-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
           const remaining = getRemainingCount(num);
           const isDisabled = remaining === 0;
